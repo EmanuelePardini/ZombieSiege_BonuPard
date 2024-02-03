@@ -18,19 +18,8 @@ void ASurvivorController::AssignPlayersIMC()
 	//Method used by Gamemode to assign players input mapping context
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 	{
-		if(UGameplayStatics::GetPlayerControllerID(this) == 0)
-		{//If is the first player then use keyboard
-			Subsystem->AddMappingContext(FirstPlayerMappingContext, 0);
-			SurvivorCharacter = Cast<ASurvivorCharacter>(UGameplayStatics::GetActorOfClass(GetWorld(),FirstPlayerSurvivorClass));
-		}
-		if(UGameplayStatics::GetPlayerControllerID(this) == 1)
-		{ //if is the second player then use joypad
-			Subsystem->AddMappingContext(SecondPlayerMappingContext, 1);
-			GEngine->AddOnScreenDebugMessage(-1,8,FColor::Red,FString::Printf(TEXT("value: %d"), UGameplayStatics::GetPlayerControllerID(this)));
-			SurvivorCharacter = Cast<ASurvivorCharacter>(UGameplayStatics::GetActorOfClass(GetWorld(),SecondPlayerSurvivorClass));
-		}
-		
-		Possess(SurvivorCharacter);
+			Subsystem->AddMappingContext(IMC, 0);
+			SurvivorCharacter = Cast<ASurvivorCharacter>(GetPawn());
 	}
 }
 

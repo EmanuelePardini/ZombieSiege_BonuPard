@@ -15,8 +15,22 @@ void AZombieSiege_GameMode::BeginPlay()
 void AZombieSiege_GameMode::InitPlayers()
 {
 	ASurvivorController* FirstController = Cast<ASurvivorController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	ASurvivorController* SecondController = Cast<ASurvivorController>(UGameplayStatics::CreatePlayer(GetWorld(), 1));
+	
 	FirstController->AssignPlayersIMC();
-	SecondController->AssignPlayersIMC();
+	
+	if(isCoop)
+	{
+		ASurvivorController* SecondController = Cast<ASurvivorController>(UGameplayStatics::CreatePlayerFromPlatformUser(GetWorld(), SecondUserId, true));
+    
+		float DelaySeconds = 0.2f; // Delay time in seconds
+		FTimerHandle UnusedHandle; // Timer handle, not used but required for the function call
+		GetWorld()->GetTimerManager().SetTimer(UnusedHandle, [SecondController]()
+		{
+			if (SecondController)
+			{
+				SecondController->AssignPlayersIMC();
+			}
+		}, DelaySeconds, false);
+	}
 	
 }

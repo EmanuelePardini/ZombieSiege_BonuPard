@@ -20,6 +20,17 @@
 			"TargetAllowList": [
 				"Editor"
 			]
+		},
+		{
+			"Name": "SteamController",
+			"Enabled": true
+		},
+		{
+			"Name": "WinDualShock",
+			"Enabled": true,
+			"SupportedTargetPlatforms": [
+				"Win64"
+			]
 		}
 	]
 }

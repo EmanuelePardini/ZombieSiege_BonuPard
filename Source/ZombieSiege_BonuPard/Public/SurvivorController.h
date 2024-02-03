@@ -23,15 +23,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Setup")
 	class USurvivorInputData* InputData;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Setup")
-	class UInputMappingContext* FirstPlayerMappingContext;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Setup")
-	 UInputMappingContext* SecondPlayerMappingContext;
-	
+	class UInputMappingContext* IMC;
+
 	//For Survivor Control
-	UPROPERTY(EditAnywhere, Category="Setup")
-	TSubclassOf<ASurvivorCharacter> FirstPlayerSurvivorClass;
-	UPROPERTY(EditAnywhere, Category="Setup")
-	TSubclassOf<ASurvivorCharacter> SecondPlayerSurvivorClass;
 	UPROPERTY()
 	ASurvivorCharacter* SurvivorCharacter;
 	

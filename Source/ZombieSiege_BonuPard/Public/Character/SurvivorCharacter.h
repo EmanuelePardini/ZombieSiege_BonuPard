@@ -5,9 +5,7 @@
 #include "CoreMinimal.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/Character.h"
-#include "GameFramework/SpringArmComponent.h"
 #include "InputActionValue.h"
-#include "SurvivorAnim.h"
 #include "SurvivorCharacter.generated.h"
 
 UCLASS()
@@ -20,10 +18,7 @@ public:
 	ASurvivorCharacter();
 
 	//Components Declaration
-
-	//Anim Instances Declaration
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Animations")
-	USurvivorAnim* Animations;
+	
 
 protected:
 	//Camera Declaration

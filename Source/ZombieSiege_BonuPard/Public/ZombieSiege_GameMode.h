@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SurvivorController.h"
 #include "GameFramework/GameModeBase.h"
 #include "ZombieSiege_GameMode.generated.h"
 

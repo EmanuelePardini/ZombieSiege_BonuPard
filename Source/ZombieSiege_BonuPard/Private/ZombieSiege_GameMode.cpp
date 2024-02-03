@@ -3,6 +3,7 @@
 
 #include "ZombieSiege_GameMode.h"
 
+#include "Character/SurvivorController.h"
 #include "Kismet/GameplayStatics.h"
 
 

@@ -1,9 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "ZombieSiege_BonuPard/Public/SurvivorCharacter.h"
-
-#include "SurvivorController.h"
+#include "ZombieSiege_BonuPard/Public/Character/SurvivorCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
@@ -18,7 +16,7 @@ ASurvivorCharacter::ASurvivorCharacter()
 
 	//Camera Settings
 	FirstPersonCamera = CreateDefaultSubobject<UCameraComponent>("FirstPersonCamera");
-	FirstPersonCamera->SetupAttachment(GetMesh());
+	FirstPersonCamera->SetupAttachment(GetMesh(), TEXT("Head"));
 	FirstPersonCamera->bUsePawnControlRotation = true;
 }
 
@@ -26,10 +24,6 @@ ASurvivorCharacter::ASurvivorCharacter()
 void ASurvivorCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	if(Animations)
-	{
-		Animations->Animate(this);
-	}
 	
 }
 

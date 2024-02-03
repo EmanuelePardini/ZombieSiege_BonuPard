@@ -1,12 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "SurvivorController.h"
+#include "Character/SurvivorController.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "EngineUtils.h"
-#include "SurvivorInputData.h"
-#include "Kismet/GameplayStatics.h"
+#include "Character/SurvivorInputData.h"
 
 void ASurvivorController::BeginPlay()
 {

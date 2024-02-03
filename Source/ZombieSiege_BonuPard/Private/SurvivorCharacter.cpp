@@ -26,6 +26,10 @@ ASurvivorCharacter::ASurvivorCharacter()
 void ASurvivorCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	if(Animations)
+	{
+		Animations->Animate(this);
+	}
 	
 }
 

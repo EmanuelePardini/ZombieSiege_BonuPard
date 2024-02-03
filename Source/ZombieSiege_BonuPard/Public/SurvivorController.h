@@ -59,8 +59,8 @@ public:
 	void EndRun(const FInputActionValue& Value);
 
 	//Crouch Manage
-	// void Crouch(const FInputActionValue& Value);
-	// void UnCrouch(const FInputActionValue& Value);
+	void Crouch(const FInputActionValue& Value);
+	void UnCrouch(const FInputActionValue& Value);
 
 	//Interaction Manage
 	void Interact(const FInputActionValue& Value);

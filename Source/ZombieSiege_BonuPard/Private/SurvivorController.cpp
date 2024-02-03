@@ -48,8 +48,8 @@ void ASurvivorController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(InputData->Drop, ETriggerEvent::Triggered, this, &ASurvivorController::Drop);
 
 		//Crouching
-		// EnhancedInputComponent->BindAction(InputData->Crouch, ETriggerEvent::Triggered, this, &ASurvivorController::Crouch);
-		// EnhancedInputComponent->BindAction(InputData->Crouch, ETriggerEvent::Completed, this, &ASurvivorController::UnCrouch);
+		EnhancedInputComponent->BindAction(InputData->Crouch, ETriggerEvent::Triggered, this, &ASurvivorController::Crouch);
+		EnhancedInputComponent->BindAction(InputData->Crouch, ETriggerEvent::Completed, this, &ASurvivorController::UnCrouch);
 
 		//Running
 		EnhancedInputComponent->BindAction(InputData->Run, ETriggerEvent::Triggered, this, &ASurvivorController::Run);
@@ -108,21 +108,21 @@ void ASurvivorController::EndRun(const FInputActionValue& Value)
 	}
 }
 
-// void ASurvivorController::Crouch(const FInputActionValue& Value)
-// {
-// 	if(SurvivorCharacter)
-// 	{
-// 		SurvivorCharacter->Crouch();
-// 	}
-// }
-//
-// void ASurvivorController::UnCrouch(const FInputActionValue& Value)
-// {
-// 	if(SurvivorCharacter)
-// 	{
-// 		SurvivorCharacter->UnCrouch();
-// 	}
-// }
+void ASurvivorController::Crouch(const FInputActionValue& Value)
+{
+	if(SurvivorCharacter)
+	{
+		SurvivorCharacter->Crouch();
+	}
+}
+
+void ASurvivorController::UnCrouch(const FInputActionValue& Value)
+{
+	if(SurvivorCharacter)
+	{
+		SurvivorCharacter->UnCrouch();
+	}
+}
 
 void ASurvivorController::Interact(const FInputActionValue& Value)
 {

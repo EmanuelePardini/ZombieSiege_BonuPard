@@ -26,7 +26,7 @@ protected:
 	class UInputMappingContext* IMC;
 
 	//For Survivor Control
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere)
 	ASurvivorCharacter* SurvivorCharacter;
 	
 	//To Manage Actions Timer and avoid Spam

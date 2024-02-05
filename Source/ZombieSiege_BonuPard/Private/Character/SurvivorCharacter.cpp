@@ -2,6 +2,7 @@
 
 
 #include "ZombieSiege_BonuPard/Public/Character/SurvivorCharacter.h"
+
 #include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
@@ -12,19 +13,16 @@ ASurvivorCharacter::ASurvivorCharacter()
 	
 	//Movement Settings
 	GetCharacterMovement()->JumpZVelocity = 500.f;
-	GetCharacterMovement()->MaxWalkSpeed = 250.f;
-
-	//Camera Settings
-	FirstPersonCamera = CreateDefaultSubobject<UCameraComponent>("FirstPersonCamera");
-	FirstPersonCamera->SetupAttachment(GetMesh(), TEXT("Head"));
-	FirstPersonCamera->bUsePawnControlRotation = true;
+	GetCharacterMovement()->MaxWalkSpeed = 400.f;
 }
 
 // Called when the game starts or when spawned
 void ASurvivorCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	//Animation Settings
+	Animations = Cast<USurvivorAnim>(GetMesh()->GetAnimInstance());
 }
 
 void ASurvivorCharacter::Move(const FInputActionValue& Value)
@@ -52,14 +50,44 @@ void ASurvivorCharacter::Look(const FInputActionValue& Value)
 	AddControllerPitchInput(LookValue.Y);
 }
 
+void ASurvivorCharacter::DoJump(const FInputActionValue& Value)
+{
+	if(!IsCrouched)
+	{
+		Jump();
+	}
+}
+
 void ASurvivorCharacter::Run(const FInputActionValue& Value)
 {
-	GetCharacterMovement()->MaxWalkSpeed = 600.f;
+	if(!IsCrouched && !IsAiming)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = 600.f;
+		Animations->IsRunning = true;
+		IsRunning = true;
+	}
 }
 
 void ASurvivorCharacter::EndRun(const FInputActionValue& Value)
 {
 	GetCharacterMovement()->MaxWalkSpeed = 400.f;
+	Animations->IsRunning = false;
+	IsRunning = false;
+}
+
+void ASurvivorCharacter::Crouch(const FInputActionValue& Value)
+{
+	if(!IsRunning)
+	{
+		IsCrouched = true;
+		Animations->IsCrouched = true;
+	}
+}
+
+void ASurvivorCharacter::UnCrouch(const FInputActionValue& Value)
+{
+	IsCrouched = false;
+	Animations->IsCrouched = false;
 }
 
 void ASurvivorCharacter::Interact(const FInputActionValue& Value)
@@ -76,4 +104,8 @@ void ASurvivorCharacter::Drop(const FInputActionValue& Value)
 void ASurvivorCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if(Animations)
+	{
+		Animations->Animate(this);
+	}
 }

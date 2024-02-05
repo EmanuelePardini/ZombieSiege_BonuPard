@@ -86,7 +86,7 @@ void ASurvivorController::Jump(const FInputActionValue& Value)
 {
 	if(SurvivorCharacter)
 	{
-		SurvivorCharacter->Jump();
+		SurvivorCharacter->DoJump(Value);
 	}
 }
 
@@ -110,7 +110,7 @@ void ASurvivorController::Crouch(const FInputActionValue& Value)
 {
 	if(SurvivorCharacter)
 	{
-		SurvivorCharacter->Crouch();
+		SurvivorCharacter->Crouch(Value);
 	}
 }
 
@@ -118,7 +118,7 @@ void ASurvivorController::UnCrouch(const FInputActionValue& Value)
 {
 	if(SurvivorCharacter)
 	{
-		SurvivorCharacter->UnCrouch();
+		SurvivorCharacter->UnCrouch(Value);
 	}
 }
 

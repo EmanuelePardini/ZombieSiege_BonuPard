@@ -62,6 +62,12 @@ public:
 	void Crouch(const FInputActionValue& Value);
 	void UnCrouch(const FInputActionValue& Value);
 
+	//Combat manage
+	void Aim(const FInputActionValue& Value);
+	void StopAim(const FInputActionValue& Value);
+	void Shoot(const FInputActionValue& Value);
+	void StopShoot(const FInputActionValue& Value);
+
 	//Interaction Manage
 	void Interact(const FInputActionValue& Value);
 

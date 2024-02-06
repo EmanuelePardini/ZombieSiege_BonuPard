@@ -49,6 +49,14 @@ void ASurvivorController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(InputData->Crouch, ETriggerEvent::Triggered, this, &ASurvivorController::Crouch);
 		EnhancedInputComponent->BindAction(InputData->Crouch, ETriggerEvent::Completed, this, &ASurvivorController::UnCrouch);
 
+		//Aiming
+		EnhancedInputComponent->BindAction(InputData->Aim, ETriggerEvent::Triggered, this, &ASurvivorController::Aim);
+		EnhancedInputComponent->BindAction(InputData->Aim, ETriggerEvent::Completed, this, &ASurvivorController::StopAim);
+
+		//Shoot
+		EnhancedInputComponent->BindAction(InputData->Shoot, ETriggerEvent::Triggered, this, &ASurvivorController::Shoot);
+		EnhancedInputComponent->BindAction(InputData->Shoot, ETriggerEvent::Completed, this, &ASurvivorController::StopShoot);
+
 		//Running
 		EnhancedInputComponent->BindAction(InputData->Run, ETriggerEvent::Triggered, this, &ASurvivorController::Run);
 		EnhancedInputComponent->BindAction(InputData->Run, ETriggerEvent::Completed, this, &ASurvivorController::EndRun);
@@ -119,6 +127,38 @@ void ASurvivorController::UnCrouch(const FInputActionValue& Value)
 	if(SurvivorCharacter)
 	{
 		SurvivorCharacter->UnCrouch(Value);
+	}
+}
+
+void ASurvivorController::Aim(const FInputActionValue& Value)
+{
+	if(SurvivorCharacter)
+	{
+		SurvivorCharacter->Aim(Value);
+	}
+}
+
+void ASurvivorController::StopAim(const FInputActionValue& Value)
+{
+	if(SurvivorCharacter)
+	{
+		SurvivorCharacter->StopAim(Value);
+	}
+}
+
+void ASurvivorController::Shoot(const FInputActionValue& Value)
+{
+	if(SurvivorCharacter)
+	{
+		SurvivorCharacter->Shoot(Value);
+	}
+}
+
+void ASurvivorController::StopShoot(const FInputActionValue& Value)
+{
+	if(SurvivorCharacter)
+	{
+		SurvivorCharacter->StopShoot(Value);
 	}
 }
 

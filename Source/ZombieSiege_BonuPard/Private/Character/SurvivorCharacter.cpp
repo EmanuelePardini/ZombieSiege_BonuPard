@@ -27,18 +27,21 @@ void ASurvivorCharacter::BeginPlay()
 
 void ASurvivorCharacter::Move(const FInputActionValue& Value)
 {
-	// Obtains the controller's rotation and create a rotation on the yaw axis
-	FVector2d MovementValue = Value.Get<FVector2d>();
-	const FRotator Rotation = Controller->GetControlRotation();
-	const FRotator YawRotation(0, Rotation.Yaw, 0);
+	if(!IsShooting)
+	{
+		// Obtains the controller's rotation and create a rotation on the yaw axis
+		FVector2d MovementValue = Value.Get<FVector2d>();
+		const FRotator Rotation = Controller->GetControlRotation();
+		const FRotator YawRotation(0, Rotation.Yaw, 0);
 
-	// Gets the forward and right directions based on the Yaw rotation
-	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+		// Gets the forward and right directions based on the Yaw rotation
+		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
-	// Adds movement input along the forward axis (ForwardDirection) and the right axis (RightDirection)
-	AddMovementInput(ForwardDirection, MovementValue.Y);
-	AddMovementInput(RightDirection, MovementValue.X);
+		// Adds movement input along the forward axis (ForwardDirection) and the right axis (RightDirection)
+		AddMovementInput(ForwardDirection, MovementValue.Y);
+		AddMovementInput(RightDirection, MovementValue.X);
+	}
 }
 
 void ASurvivorCharacter::Look(const FInputActionValue& Value)
@@ -52,7 +55,7 @@ void ASurvivorCharacter::Look(const FInputActionValue& Value)
 
 void ASurvivorCharacter::DoJump(const FInputActionValue& Value)
 {
-	if(!IsCrouched)
+	if(!IsCrouched && !IsAiming)
 	{
 		Jump();
 	}
@@ -77,8 +80,9 @@ void ASurvivorCharacter::EndRun(const FInputActionValue& Value)
 
 void ASurvivorCharacter::Crouch(const FInputActionValue& Value)
 {
-	if(!IsRunning)
+	if(!IsRunning && !IsAiming)
 	{
+		GetCharacterMovement()->MaxWalkSpeed = 250.f;
 		IsCrouched = true;
 		Animations->IsCrouched = true;
 	}
@@ -86,8 +90,47 @@ void ASurvivorCharacter::Crouch(const FInputActionValue& Value)
 
 void ASurvivorCharacter::UnCrouch(const FInputActionValue& Value)
 {
-	IsCrouched = false;
-	Animations->IsCrouched = false;
+	if(!IsAiming)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = 400.f;
+		IsCrouched = false;
+		Animations->IsCrouched = false;
+	}
+}
+
+void ASurvivorCharacter::Aim(const FInputActionValue& Value)
+{
+	if(!IsRunning)
+	{
+		IsAiming = true;
+		Animations->IsAiming = true;
+	}
+}
+
+void ASurvivorCharacter::StopAim(const FInputActionValue& Value)
+{
+	IsShooting = false;
+	Animations->IsShooting = false;
+	IsAiming = false;
+	Animations->IsAiming = false;
+}
+
+void ASurvivorCharacter::Shoot(const FInputActionValue& Value)
+{
+	if(IsAiming)
+	{
+		IsShooting = true;
+		Animations->IsShooting = true;
+	}
+}
+
+void ASurvivorCharacter::StopShoot(const FInputActionValue& Value)
+{
+	if(IsAiming)
+	{
+		IsShooting = false;
+		Animations->IsShooting = false;
+	}
 }
 
 void ASurvivorCharacter::Interact(const FInputActionValue& Value)

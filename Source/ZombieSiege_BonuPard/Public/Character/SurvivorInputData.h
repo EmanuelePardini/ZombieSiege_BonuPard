@@ -30,4 +30,8 @@ public:
 	UInputAction* Interact;
 	UPROPERTY(EditDefaultsOnly, Category="Setup")
 	UInputAction* Drop;
+	UPROPERTY(EditDefaultsOnly, Category="Setup")
+	UInputAction* Aim;
+	UPROPERTY(EditDefaultsOnly, Category="Setup")
+	UInputAction* Shoot;
 };

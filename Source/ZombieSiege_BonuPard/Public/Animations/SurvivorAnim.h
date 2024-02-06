@@ -14,12 +14,15 @@ class ZOMBIESIEGE_BONUPARD_API USurvivorAnim : public UAnimInstance
 {
 	GENERATED_BODY()
 public:
+	//All public variables are setted in the Character Input settings
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	bool IsCrouched = false;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	bool IsRunning = false;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	bool IsAiming = false;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	bool IsShooting = false;
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)

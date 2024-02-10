@@ -34,4 +34,6 @@ public:
 	UInputAction* Aim;
 	UPROPERTY(EditDefaultsOnly, Category="Setup")
 	UInputAction* Shoot;
+	UPROPERTY(EditDefaultsOnly, Category="Setup")
+	UInputAction* Reload;
 };

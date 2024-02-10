@@ -53,9 +53,12 @@ void ASurvivorController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(InputData->Aim, ETriggerEvent::Triggered, this, &ASurvivorController::Aim);
 		EnhancedInputComponent->BindAction(InputData->Aim, ETriggerEvent::Completed, this, &ASurvivorController::StopAim);
 
-		//Shoot
+		//Shooting
 		EnhancedInputComponent->BindAction(InputData->Shoot, ETriggerEvent::Triggered, this, &ASurvivorController::Shoot);
 		EnhancedInputComponent->BindAction(InputData->Shoot, ETriggerEvent::Completed, this, &ASurvivorController::StopShoot);
+
+		//Reloading
+		EnhancedInputComponent->BindAction(InputData->Reload, ETriggerEvent::Triggered, this, &ASurvivorController::Reload);
 
 		//Running
 		EnhancedInputComponent->BindAction(InputData->Run, ETriggerEvent::Triggered, this, &ASurvivorController::Run);
@@ -159,6 +162,14 @@ void ASurvivorController::StopShoot(const FInputActionValue& Value)
 	if(SurvivorCharacter)
 	{
 		SurvivorCharacter->StopShoot(Value);
+	}
+}
+
+void ASurvivorController::Reload(const FInputActionValue& Value)
+{
+	if(SurvivorCharacter)
+	{
+		SurvivorCharacter->Reload(Value);
 	}
 }
 

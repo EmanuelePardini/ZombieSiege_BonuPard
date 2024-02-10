@@ -23,6 +23,8 @@ public:
 	bool IsAiming = false;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	bool IsShooting = false;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	bool IsReloading = false;
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)

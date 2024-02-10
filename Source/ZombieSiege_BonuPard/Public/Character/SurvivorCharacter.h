@@ -5,11 +5,15 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
+#include "Interfaces/SpawnInterface.h"
 #include "Animations/SurvivorAnim.h"
+#include "Components/HealthComponent.h"
+#include "Components/ProjectileComponent.h"
+#include "Sound/SoundCue.h"
 #include "SurvivorCharacter.generated.h"
 
 UCLASS()
-class ZOMBIESIEGE_BONUPARD_API ASurvivorCharacter : public ACharacter
+class ZOMBIESIEGE_BONUPARD_API ASurvivorCharacter : public ACharacter, public ISpawnInterface
 {
 	GENERATED_BODY()
 
@@ -18,10 +22,15 @@ public:
 	ASurvivorCharacter();
 
 	//Components Declaration
-
+	UPROPERTY(EditAnywhere, Category = "Setup")
+	UHealthComponent* HealthComponent;
+	UPROPERTY(EditAnywhere, Category = "Setup")
+	UProjectileComponent* ProjectileComponent;
+	
 	//Animations Declaration
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Animations")
+	UPROPERTY()
 	USurvivorAnim* Animations;
+	
 	//Movement Parameters
 	UPROPERTY(VisibleAnywhere)
 	bool IsCrouched = false;
@@ -31,6 +40,20 @@ public:
 	bool IsRunning = false;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	bool IsShooting = false;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	bool IsReloading = false;
+
+	//Timers
+	UPROPERTY(EditAnywhere, Category = "Setup")
+	float ReloadDelay = 2.f;
+	UPROPERTY(EditAnywhere, Category = "Setup")
+	float ReloadTimer = 0.f;
+
+	//Audio Management
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+	UAudioComponent* AudioComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+	USoundCue* ShootingSound;
 	
 protected:
 	
@@ -58,6 +81,8 @@ public:
 	void StopAim(const FInputActionValue& Value);
 	void Shoot(const FInputActionValue& Value);
 	void StopShoot(const FInputActionValue& Value);
+	void Reload(const FInputActionValue& Value);
+	void ManageReload(float DeltaTime); //Once the action started doesn't need the player to keep the button
 	
 	//Interaction Manage
 	void Interact(const FInputActionValue& Value);
@@ -68,4 +93,6 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void Spawn(FVector Location) override;
+	virtual void Die() override;
 };

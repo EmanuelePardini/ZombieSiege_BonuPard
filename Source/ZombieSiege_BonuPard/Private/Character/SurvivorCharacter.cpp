@@ -3,7 +3,9 @@
 
 #include "ZombieSiege_BonuPard/Public/Character/SurvivorCharacter.h"
 
+#include "Components/AudioComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Interfaces/SpawnInterface.h"
 
 // Sets default values
 ASurvivorCharacter::ASurvivorCharacter()
@@ -14,6 +16,16 @@ ASurvivorCharacter::ASurvivorCharacter()
 	//Movement Settings
 	GetCharacterMovement()->JumpZVelocity = 500.f;
 	GetCharacterMovement()->MaxWalkSpeed = 400.f;
+
+	//Audio Settings
+	AudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComponent"));
+	AudioComponent->bAutoActivate = false;
+
+	//Components Settings
+	ProjectileComponent = CreateDefaultSubobject<UProjectileComponent>("ProjectileComponent");
+	HealthComponent = CreateDefaultSubobject<UHealthComponent>("HealthComponent");
+	HealthComponent->MaxHealth = 50.f;
+	HealthComponent->Health = 50.f;
 }
 
 // Called when the game starts or when spawned
@@ -23,11 +35,12 @@ void ASurvivorCharacter::BeginPlay()
 
 	//Animation Settings
 	Animations = Cast<USurvivorAnim>(GetMesh()->GetAnimInstance());
+	
 }
 
 void ASurvivorCharacter::Move(const FInputActionValue& Value)
 {
-	if(!IsShooting)
+	if(!IsShooting && !IsReloading)
 	{
 		// Obtains the controller's rotation and create a rotation on the yaw axis
 		FVector2d MovementValue = Value.Get<FVector2d>();
@@ -100,7 +113,7 @@ void ASurvivorCharacter::UnCrouch(const FInputActionValue& Value)
 
 void ASurvivorCharacter::Aim(const FInputActionValue& Value)
 {
-	if(!IsRunning)
+	if(!IsRunning && !IsReloading)
 	{
 		IsAiming = true;
 		Animations->IsAiming = true;
@@ -109,27 +122,62 @@ void ASurvivorCharacter::Aim(const FInputActionValue& Value)
 
 void ASurvivorCharacter::StopAim(const FInputActionValue& Value)
 {
+	//First stop shooting
+	AudioComponent->Stop();
 	IsShooting = false;
 	Animations->IsShooting = false;
+	
 	IsAiming = false;
 	Animations->IsAiming = false;
 }
 
 void ASurvivorCharacter::Shoot(const FInputActionValue& Value)
 {
-	if(IsAiming)
-	{
+	if(IsAiming && ProjectileComponent->ActualAmmo > 0)
+	{ //If is aiming and has ammo then can shoot
+		if(!IsShooting) //If is starting to shoot now play the sound only one time
+		{
+			AudioComponent->SetSound(ShootingSound);
+			AudioComponent->Play();
+		}
 		IsShooting = true;
 		Animations->IsShooting = true;
+		ProjectileComponent->Shoot();
+
+	}
+	else
+	{ //If has no ammo need to recharge
+		Reload(true);
 	}
 }
 
 void ASurvivorCharacter::StopShoot(const FInputActionValue& Value)
 {
-	if(IsAiming)
-	{
+		AudioComponent->Stop();
 		IsShooting = false;
 		Animations->IsShooting = false;
+}
+
+void ASurvivorCharacter::Reload(const FInputActionValue& Value)
+{
+	if(ProjectileComponent->ActualAmmo < ProjectileComponent->LoaderAmmo)
+	{
+		StopShoot(true);
+		StopAim(true);
+		IsReloading = true;
+		Animations->IsReloading = true;
+	}
+}
+
+void ASurvivorCharacter::ManageReload(float DeltaTime)
+{
+	ReloadTimer += DeltaTime;
+	if(ReloadTimer >= ReloadDelay)
+	{
+		ProjectileComponent->ActualAmmo = 30;
+		Animations->IsReloading = false;
+		IsReloading = false;
+		ReloadTimer = 0;
 	}
 }
 
@@ -147,8 +195,25 @@ void ASurvivorCharacter::Drop(const FInputActionValue& Value)
 void ASurvivorCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	//For animations
 	if(Animations)
 	{
 		Animations->Animate(this);
 	}
+	//For automatic Actions
+	if(IsReloading)
+	{
+		ManageReload(DeltaTime);
+	}
+	
+}
+
+void ASurvivorCharacter::Spawn(FVector Location)
+{
+	ISpawnInterface::Spawn(Location);
+}
+
+void ASurvivorCharacter::Die()
+{
+	ISpawnInterface::Die();
 }

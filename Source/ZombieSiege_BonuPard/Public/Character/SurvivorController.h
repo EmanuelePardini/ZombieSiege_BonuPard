@@ -67,6 +67,7 @@ public:
 	void StopAim(const FInputActionValue& Value);
 	void Shoot(const FInputActionValue& Value);
 	void StopShoot(const FInputActionValue& Value);
+	void Reload(const FInputActionValue& Value);
 
 	//Interaction Manage
 	void Interact(const FInputActionValue& Value);

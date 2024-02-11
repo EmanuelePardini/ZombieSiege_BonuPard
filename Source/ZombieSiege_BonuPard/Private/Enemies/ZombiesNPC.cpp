@@ -130,16 +130,16 @@ void AZombiesNPC::Spawn(FVector Location)
 void AZombiesNPC::Die()
 {
 	ISpawnInterface::Die();
+	
+	//Update the Zombie killed for the round counter
+	AZombiesRounds* Round = Cast<AZombiesRounds>(UGameplayStatics::GetActorOfClass(GetWorld(), AZombiesRounds::StaticClass()));
+	if(Round && !IsDied) Round->ZombiesKilledThisRound++;
+	
 	//That notify that the Zombie is ready for another use
 	IsDied = true;
 	
 	SetActorLocation(FVector(0,0,0));
 	SetActorHiddenInGame(true);
 	SetActorEnableCollision(false);
-	
-	//Update the Zombie killed for the round counter
-	AZombiesRounds* Round = Cast<AZombiesRounds>(UGameplayStatics::GetActorOfClass(GetWorld(), AZombiesRounds::StaticClass()));
-	if(Round) Round->ZombiesKilledThisRound++;
-	
 }
 

@@ -17,6 +17,22 @@ AZombiesRounds::AZombiesRounds()
 void AZombiesRounds::BeginPlay()
 {
 	Super::BeginPlay();
+	Init();
+}
+
+// Called every frame
+void AZombiesRounds::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	GEngine->AddOnScreenDebugMessage(1,1,FColor::Red,FString::Printf(TEXT("ActualRound: %d"), ActualRound));
+	GEngine->AddOnScreenDebugMessage(2,1,FColor::Red,FString::Printf(TEXT("Spawned: %d"), ZombiesSpawnedThisRound));
+	GEngine->AddOnScreenDebugMessage(3,1,FColor::Red,FString::Printf(TEXT("Killed: %d"), ZombiesKilledThisRound));
+	ManageRound(DeltaTime);
+}
+
+void AZombiesRounds::Init()
+{
+	//Init is used to Jump Round 0 and reposition Zombies
 	for(auto& Spawner : Spawners)
 	{
 		for(auto Zombie : Spawner->Zombies)
@@ -24,14 +40,6 @@ void AZombiesRounds::BeginPlay()
 			Zombie->Die(); //To begin by Round One and send Zombies to spawn location
 		}
 	}
-}
-
-// Called every frame
-void AZombiesRounds::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-	GEngine->AddOnScreenDebugMessage(1,8,FColor::Red,FString::Printf(TEXT("value: %d"), ActualRound));
-	ManageRound(DeltaTime);
 }
 
 void AZombiesRounds::ManageRound(float DeltaTime)
@@ -47,13 +55,13 @@ void AZombiesRounds::ManageRound(float DeltaTime)
 	}
 	else
 	{//else if the player is in the round check if have to spawn zombies or terminate round
-		if (ZombiesSpawnedThisRound < ZombiesxRounds[ActualRound]) ActivateZombies(DeltaTime);
+		if(ZombiesSpawnedThisRound < ZombiesxRounds[ActualRound] && ActualRound > 0) ActivateZombies();
 		if(ZombiesKilledThisRound >= ZombiesxRounds[ActualRound])  TerminateRound();
 	}
 }
 
-//TODO: Adjust: Round Logic, Zombie quantity and stats
-void AZombiesRounds::ActivateZombies(float DeltaTime)
+//TODO: Adjust: Zombie quantity/spawner positions and stats
+void AZombiesRounds::ActivateZombies()
 { //For any spawners spawn [Actual Round] Zombies
 	for(auto& Spawner : Spawners)
 	{
@@ -62,13 +70,12 @@ void AZombiesRounds::ActivateZombies(float DeltaTime)
 			if(Zombie)
 			{
 				//If the resource Zombie is free we can use that
-				if(Zombie)
+				if(Zombie->IsDied)
 				{
 					GEngine->AddOnScreenDebugMessage(-1,8,FColor::Red, Zombie->GetActorLabel());
 					Zombie->Spawn(Spawner->GetActorLocation());
 					ZombiesSpawnedThisRound++;
 				}
-
 			}
 		}
 	}
@@ -79,6 +86,7 @@ void AZombiesRounds::TerminateRound()
 	IsIntoRound = false;
 	RoundTimer = 0.f;
 	ZombiesSpawnedThisRound = 0;
+	ZombiesKilledThisRound = 0;
 	if(ActualRound < ZombiesxRounds.Num()-1)
 	{
 		ActualRound++;
@@ -87,7 +95,7 @@ void AZombiesRounds::TerminateRound()
 	{
 		EndGame();
 	}
-	ZombiesKilledThisRound = 0;
+	
 }
 
 void AZombiesRounds::EndGame()

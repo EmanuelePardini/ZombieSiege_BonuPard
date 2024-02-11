@@ -49,8 +49,9 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	void Init();
 	void ManageRound(float DeltaTime);
-	void ActivateZombies(float DeltaTime);
+	void ActivateZombies();
 	void TerminateRound();
 	void EndGame();
 };

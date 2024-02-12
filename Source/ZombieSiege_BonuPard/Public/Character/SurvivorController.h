@@ -16,14 +16,14 @@ class ZOMBIESIEGE_BONUPARD_API ASurvivorController : public APlayerController
 {
 	GENERATED_BODY()
 public:
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Setup")
+	class UInputMappingContext* IMC;
 
 protected:
 	//For Inputs
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Setup")
 	class USurvivorInputData* InputData;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Setup")
-	class UInputMappingContext* IMC;
+
 
 	//For Survivor Control
 	UPROPERTY(VisibleAnywhere)
@@ -68,6 +68,11 @@ public:
 	void Shoot(const FInputActionValue& Value);
 	void StopShoot(const FInputActionValue& Value);
 	void Reload(const FInputActionValue& Value);
+
+	//Build Manage
+	void ToggleBuild(const FInputActionValue& Value);
+	void Build(const FInputActionValue& Value);
+	void SwapBuildable(const FInputActionValue& InputActionValue);
 
 	//Interaction Manage
 	void Interact(const FInputActionValue& Value);

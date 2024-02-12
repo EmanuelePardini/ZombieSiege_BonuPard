@@ -3,6 +3,8 @@
 
 #include "BuildSystem.h"
 
+#include "Character/SurvivorCharacter.h"
+
 // Sets default values for this component's properties
 UBuildSystem::UBuildSystem()
 {

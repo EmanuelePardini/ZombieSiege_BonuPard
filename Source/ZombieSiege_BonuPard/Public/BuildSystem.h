@@ -6,7 +6,6 @@
 #include "InventoryComponent.h"
 #include "Turret.h"
 #include "Camera/CameraComponent.h"
-#include "Character/SurvivorCharacter.h"
 #include "Components/ActorComponent.h"
 #include "BuildSystem.generated.h"
 
@@ -19,7 +18,7 @@ class ZOMBIESIEGE_BONUPARD_API UBuildSystem : public UActorComponent
 	UCameraComponent* Camera;
 
 	UPROPERTY(VisibleAnywhere, Category="Setup")
-	ASurvivorCharacter* PlayerReference;
+	class ASurvivorCharacter* PlayerReference;
 
 	UPROPERTY(VisibleAnywhere, Category="Setup")
 	float BuildDistance = 400.f;

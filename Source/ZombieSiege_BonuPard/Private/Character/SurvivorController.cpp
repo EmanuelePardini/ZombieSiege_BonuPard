@@ -60,6 +60,11 @@ void ASurvivorController::SetupInputComponent()
 		//Reloading
 		EnhancedInputComponent->BindAction(InputData->Reload, ETriggerEvent::Triggered, this, &ASurvivorController::Reload);
 
+		//Building
+		EnhancedInputComponent->BindAction(InputData->ToggleBuild, ETriggerEvent::Started, this, &ASurvivorController::ToggleBuild);
+		EnhancedInputComponent->BindAction(InputData->Build, ETriggerEvent::Started, this, &ASurvivorController::Build);
+		EnhancedInputComponent->BindAction(InputData->SwapBuildable, ETriggerEvent::Triggered, this, &ASurvivorController::SwapBuildable);
+		
 		//Running
 		EnhancedInputComponent->BindAction(InputData->Run, ETriggerEvent::Triggered, this, &ASurvivorController::Run);
 		EnhancedInputComponent->BindAction(InputData->Run, ETriggerEvent::Completed, this, &ASurvivorController::EndRun);
@@ -170,6 +175,30 @@ void ASurvivorController::Reload(const FInputActionValue& Value)
 	if(SurvivorCharacter)
 	{
 		SurvivorCharacter->Reload(Value);
+	}
+}
+
+void ASurvivorController::ToggleBuild(const FInputActionValue& Value)
+{
+	if(SurvivorCharacter)
+	{
+		SurvivorCharacter->ToggleBuild(Value);
+	}
+}
+
+void ASurvivorController::Build(const FInputActionValue& Value)
+{
+	if(SurvivorCharacter)
+	{
+		SurvivorCharacter->Build(Value);
+	}
+}
+
+void ASurvivorController::SwapBuildable(const FInputActionValue& Value)
+{
+	if(SurvivorCharacter)
+	{
+		SurvivorCharacter->SwapBuildable(Value);
 	}
 }
 

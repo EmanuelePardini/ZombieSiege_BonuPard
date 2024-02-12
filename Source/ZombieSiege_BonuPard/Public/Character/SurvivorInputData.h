@@ -36,4 +36,10 @@ public:
 	UInputAction* Shoot;
 	UPROPERTY(EditDefaultsOnly, Category="Setup")
 	UInputAction* Reload;
+	UPROPERTY(EditDefaultsOnly, Category="Setup")
+	UInputAction* ToggleBuild;
+	UPROPERTY(EditDefaultsOnly, Category="Setup")
+	UInputAction* Build;
+	UPROPERTY(EditDefaultsOnly, Category="Setup")
+	UInputAction* SwapBuildable;
 };

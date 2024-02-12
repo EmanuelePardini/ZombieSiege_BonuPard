@@ -3,6 +3,7 @@
 
 #include "ZombieSiege_BonuPard/Public/Character/SurvivorCharacter.h"
 
+#include "BuildSystem.h"
 #include "Components/AudioComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Interfaces/SpawnInterface.h"
@@ -23,6 +24,9 @@ ASurvivorCharacter::ASurvivorCharacter()
 
 	//Components Settings
 	ProjectileComponent = CreateDefaultSubobject<UProjectileComponent>("ProjectileComponent");
+	LineTraceComponent = CreateDefaultSubobject<ULineTraceComponent>("LineTraceComponent");
+	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>("InventoryComponent");
+	BuildSystemComponent = CreateDefaultSubobject<UBuildSystem>("BuildSystemComponent");
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>("HealthComponent");
 	HealthComponent->MaxHealth = 50.f;
 	HealthComponent->Health = 50.f;
@@ -181,14 +185,37 @@ void ASurvivorCharacter::ManageReload(float DeltaTime)
 	}
 }
 
+void ASurvivorCharacter::ToggleBuild(const FInputActionValue& Value)
+{
+	if (auto* BuildSystem = GetComponentByClass<UBuildSystem>())
+	{
+		BuildSystem->ToggleBuildMode();
+	}
+}
+
+void ASurvivorCharacter::Build(const FInputActionValue& Value)
+{
+	if (auto* BuildSystem = GetComponentByClass<UBuildSystem>())
+	{
+		BuildSystem->Build();
+	}
+}
+
+void ASurvivorCharacter::SwapBuildable(const FInputActionValue& InputActionValue)
+{
+	if (auto* BuildSystem = GetComponentByClass<UBuildSystem>())
+	{
+		BuildSystem->SwapBuildable(InputActionValue.Get<float>());
+	}
+}
+
 void ASurvivorCharacter::Interact(const FInputActionValue& Value)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Red, FString(TEXT("To implement Interact")));
+	GetComponentByClass<ULineTraceComponent>()->Interact();
 }
 
 void ASurvivorCharacter::Drop(const FInputActionValue& Value)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Red, FString(TEXT("To implement Drop")));
 }
 
 // Called every frame

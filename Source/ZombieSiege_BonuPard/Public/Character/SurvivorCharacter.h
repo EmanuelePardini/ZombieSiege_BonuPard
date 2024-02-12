@@ -3,8 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "BuildSystem.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
+#include "InventoryComponent.h"
+#include "LineTraceComponent.h"
 #include "Interfaces/SpawnInterface.h"
 #include "Animations/SurvivorAnim.h"
 #include "Components/HealthComponent.h"
@@ -26,6 +29,12 @@ public:
 	UHealthComponent* HealthComponent;
 	UPROPERTY(EditAnywhere, Category = "Setup")
 	UProjectileComponent* ProjectileComponent;
+	UPROPERTY(EditAnywhere, Category = "Setup")
+	ULineTraceComponent* LineTraceComponent;
+	UPROPERTY(EditAnywhere, Category = "Setup")
+	UInventoryComponent* InventoryComponent;
+	UPROPERTY(EditAnywhere, Category="Setup")
+	UBuildSystem* BuildSystemComponent;
 	
 	//Animations Declaration
 	UPROPERTY()
@@ -83,6 +92,11 @@ public:
 	void StopShoot(const FInputActionValue& Value);
 	void Reload(const FInputActionValue& Value);
 	void ManageReload(float DeltaTime); //Once the action started doesn't need the player to keep the button
+
+	//Build Manage
+	void ToggleBuild(const FInputActionValue& Value);
+	void Build(const FInputActionValue& Value);
+	void SwapBuildable(const FInputActionValue& InputActionValue);
 	
 	//Interaction Manage
 	void Interact(const FInputActionValue& Value);

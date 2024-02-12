@@ -4,12 +4,19 @@
 #include "ZombieSiege_GameMode.h"
 
 #include "Character/SurvivorController.h"
+#include "Components/AudioComponent.h"
 #include "Kismet/GameplayStatics.h"
 
+
+AZombieSiege_GameMode::AZombieSiege_GameMode()
+{
+	
+}
 
 void AZombieSiege_GameMode::BeginPlay()
 {
 	Super::BeginPlay();
+	
 	InitPlayers();
 }
 

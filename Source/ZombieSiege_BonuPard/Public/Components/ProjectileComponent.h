@@ -32,7 +32,7 @@ public:
 
 	//Loader Variables
 	UPROPERTY(EditAnywhere, Category = "Setup")
-	int LoaderAmmo = 30;
+	int LoaderAmmo = 50;
 	UPROPERTY()
 	int ActualAmmo = LoaderAmmo;
 	//TODO: Ammo Packs and total ammo?

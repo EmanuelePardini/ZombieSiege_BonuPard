@@ -60,7 +60,6 @@ void AZombiesRounds::ManageRound(float DeltaTime)
 	}
 }
 
-//TODO: Adjust: Zombie quantity/spawner positions and stats
 void AZombiesRounds::ActivateZombies()
 { //For any spawners spawn [Actual Round] Zombies
 	for(auto& Spawner : Spawners)

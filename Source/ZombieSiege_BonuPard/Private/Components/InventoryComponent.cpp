@@ -1,9 +1,9 @@
 
 
-#include "InventoryComponent.h"
+#include "Components/InventoryComponent.h"
 
-#include "..\Public\Turret.h"
-#include "ZombieSiege_BonuPard//Public/ItemData.h"
+#include "Items/InventorySlot.h"
+#include "Items/ItemData.h"
 
 UInventoryComponent::UInventoryComponent()
 {

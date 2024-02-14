@@ -3,6 +3,8 @@
 
 #include "Enemies/ZombiesRounds.h"
 
+#include "Components/AudioComponent.h"
+
 // Sets default values
 AZombiesRounds::AZombiesRounds()
 {
@@ -11,6 +13,9 @@ AZombiesRounds::AZombiesRounds()
 	
 	//The array length is the round number and the indexes values is the number of zombies for any round
 	ZombiesxRounds = {25, 50, 100, 150, 200, 250};
+
+	AudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComponent"));
+	AudioComponent->bAutoActivate = false;
 }
 
 // Called when the game starts or when spawned
@@ -24,9 +29,6 @@ void AZombiesRounds::BeginPlay()
 void AZombiesRounds::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	GEngine->AddOnScreenDebugMessage(1,1,FColor::Red,FString::Printf(TEXT("ActualRound: %d"), ActualRound));
-	GEngine->AddOnScreenDebugMessage(2,1,FColor::Red,FString::Printf(TEXT("Spawned: %d"), ZombiesSpawnedThisRound));
-	GEngine->AddOnScreenDebugMessage(3,1,FColor::Red,FString::Printf(TEXT("Killed: %d"), ZombiesKilledThisRound));
 	ManageRound(DeltaTime);
 }
 
@@ -57,6 +59,13 @@ void AZombiesRounds::ManageRound(float DeltaTime)
 	{//else if the player is in the round check if have to spawn zombies or terminate round
 		if(ZombiesSpawnedThisRound < ZombiesxRounds[ActualRound] && ActualRound > 0) ActivateZombies();
 		if(ZombiesKilledThisRound >= ZombiesxRounds[ActualRound])  TerminateRound();
+
+		//If last Zombie play Last zombie audio
+		if(ZombiesKilledThisRound+1 == ZombiesxRounds[ActualRound])
+		{
+			AudioComponent->SetSound(LastZombieSound);
+			AudioComponent->Play();
+		}
 	}
 }
 
@@ -69,9 +78,8 @@ void AZombiesRounds::ActivateZombies()
 			if(Zombie)
 			{
 				//If the resource Zombie is free we can use that
-				if(Zombie->IsDied)
+				if(Zombie->CanSpawn)
 				{
-					GEngine->AddOnScreenDebugMessage(-1,8,FColor::Red, Zombie->GetActorLabel());
 					Zombie->Spawn(Spawner->GetActorLocation());
 					ZombiesSpawnedThisRound++;
 				}
@@ -82,6 +90,9 @@ void AZombiesRounds::ActivateZombies()
 
 void AZombiesRounds::TerminateRound()
 {
+	AudioComponent->SetSound(RoundEndSound);
+	AudioComponent->Play();
+	
 	IsIntoRound = false;
 	RoundTimer = 0.f;
 	ZombiesSpawnedThisRound = 0;
@@ -99,7 +110,7 @@ void AZombiesRounds::TerminateRound()
 
 void AZombiesRounds::EndGame()
 {
-	//TODO: Implement EndGame
+	//TODO: Implement Main, Pause, GameOver, EndGame Menu
 }
 
 

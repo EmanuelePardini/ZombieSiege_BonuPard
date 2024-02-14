@@ -17,14 +17,19 @@ class ZOMBIESIEGE_BONUPARD_API AZombieSiege_GameMode : public AGameModeBase
 public:
 	AZombieSiege_GameMode();
 	
-//TODO: Begin HUD
 	UPROPERTY(EditAnywhere)
 	bool isCoop = true; //To switch by single and multiplayer
 	UPROPERTY(EditAnywhere)
-	FPlatformUserId SecondUserId = 1; //On my x360 controller emulator i used the second slot, if needed change that
+	FPlatformUserId SecondUserId = 1;//On my x360 controller emulator i used the second slot, if needed change that
+	//Audio Management
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+	UAudioComponent* AudioComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+	USoundCue* Soundtrack;
 
 	
 protected:
 	virtual void BeginPlay() override;
+	void OnAudioFinished();
 	virtual void InitPlayers(); 
 };

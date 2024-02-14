@@ -1,9 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "BuyableItem.h"
-#include "InventoryComponent.h"
-#include "Logging/StructuredLog.h"
+#include "Items/BuyableItem.h"
+#include "Components/InventoryComponent.h"
 
 // Sets default values
 ABuyableItem::ABuyableItem()

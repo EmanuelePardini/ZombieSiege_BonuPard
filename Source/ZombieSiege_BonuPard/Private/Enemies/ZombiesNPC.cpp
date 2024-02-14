@@ -3,14 +3,14 @@
 
 #include "Enemies/ZombiesNPC.h"
 
+#include "Animations/ZombieAnim.h"
 #include "Enemies/ZombiesRounds.h"
 #include "Components/HealthComponent.h"
 #include "Towers/Shelter.h"
 #include "Character/SurvivorCharacter.h"
+#include "Components/AudioComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
-
-//TODO: Make Zombies Anim and Sounds
 
 // Sets default values
 AZombiesNPC::AZombiesNPC()
@@ -19,40 +19,74 @@ AZombiesNPC::AZombiesNPC()
 	PrimaryActorTick.bCanEverTick = true;
 
 	//Velocity
-	GetCharacterMovement()->MaxWalkSpeed = Velocity;
-
+	GetCharacterMovement()->MaxWalkSpeed = Speed;
+	
 	//Health
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>("HealthComponent");
 	HealthComponent->MaxHealth = 50.f;
 	HealthComponent->Health = 50.f;
+
+	AudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComponent"));
+	AudioComponent->bAutoActivate = false;
 }
 
 // Called when the game starts or when spawned
 void AZombiesNPC::BeginPlay()
 {
 	Super::BeginPlay();
+
 	AIController = Cast<AZombiesAIController>(GetController());
 	SetObjToSearch();
+	
+	//Animation Settings
+	Animations = Cast<UZombieAnim>(GetMesh()->GetAnimInstance());
 }
 
 // Called every frame
 void AZombiesNPC::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if(Animations) Animations->Animate(this);
+	if(!IsDied) SearchObj(ObjToSearch);
+	if(IsDied) Move(GetActorLocation()); //If is died stop moving to the last location setted
+	ManageTimers(DeltaTime);
 	
+}
+
+void AZombiesNPC::ManageTimers(float DeltaTime)
+{
 	if(AttackTimer < AttackDelay)
 	{
 		AttackTimer += DeltaTime;
 	}
-	
-	SearchObj(ObjToSearch);
+	if(IsDied)
+	{
+		//Wait for the animation to play and then respawn
+		Animations->IsDying = true;
+		DyingTimer += DeltaTime;
+		if(DyingTimer >= DyingDelay)
+		{
+			DyingTimer = 0;
+			CanSpawn = true;
+		}
+	}
 }
 
 
 void AZombiesNPC::Move(FVector Destination)
 {
 	//Use pathfinding system of AIController
-	if(AIController) AIController->MoveToLocation(Destination);
+		if(AIController) AIController->MoveToLocation(Destination);
+		Animations->IsAttacking = false;
+
+		//Let the zombie play his sound in random moments
+		int Rand = FMath::RandRange(1, 10000);
+		if (Rand == 5000)
+		{
+			AudioComponent->SetSound(GrowningSound);
+			AudioComponent->Play();
+		}
+		
 }
 
 void AZombiesNPC::SearchObj(int Objective)
@@ -106,13 +140,17 @@ void AZombiesNPC::SearchObj(int Objective)
 
 void AZombiesNPC::Attack(AActor* AttackedActor)
 {
-	UHealthComponent* HealthComp = Cast<UHealthComponent>(AttackedActor->GetComponentByClass(UHealthComponent::StaticClass()));
-	AZombiesNPC* Zombie = Cast<AZombiesNPC>(AttackedActor);
-	if (HealthComp && AttackTimer>=AttackDelay && !Zombie)
-	{
-		HealthComp->DecrementHealth(DamageAmount);
-		AttackTimer = 0.f;
-	}
+		AudioComponent->SetSound(AttackSound);
+		AudioComponent->Play();
+		Animations->IsAttacking = true;
+	
+		UHealthComponent* HealthComp = Cast<UHealthComponent>(AttackedActor->GetComponentByClass(UHealthComponent::StaticClass()));
+		AZombiesNPC* Zombie = Cast<AZombiesNPC>(AttackedActor);
+		if (HealthComp && AttackTimer>=AttackDelay && !Zombie)
+		{
+			HealthComp->DecrementHealth(DamageAmount);
+			AttackTimer = 0.f;
+		}
 }
 
 void AZombiesNPC::Spawn(FVector Location)
@@ -120,6 +158,9 @@ void AZombiesNPC::Spawn(FVector Location)
 	ISpawnInterface::Spawn(Location);
 	//That notify that the Zombie is occupied
 	IsDied = false;
+	CanSpawn = false;
+	Animations->IsDying = false;
+	
 	HealthComponent->Health = HealthComponent->MaxHealth;
 	
 	SetActorLocation(Location);
@@ -137,9 +178,5 @@ void AZombiesNPC::Die()
 	
 	//That notify that the Zombie is ready for another use
 	IsDied = true;
-	
-	SetActorLocation(FVector(0,0,0));
-	SetActorHiddenInGame(true);
-	SetActorEnableCollision(false);
 }
 

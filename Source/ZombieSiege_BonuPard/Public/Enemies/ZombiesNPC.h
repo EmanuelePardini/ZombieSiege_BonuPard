@@ -7,6 +7,7 @@
 #include "ZombiesAIController.h"
 #include "Components/HealthComponent.h"
 #include "GameFramework/Character.h"
+#include "Sound/SoundCue.h"
 #include "ZombiesNPC.generated.h"
 
 UCLASS()
@@ -21,19 +22,26 @@ public:
 	int ObjToSearch = 0; //0 Nothing, 1 Players, 2 Shelter
 	UPROPERTY(VisibleAnywhere)
 	bool IsDied = false;
+	UPROPERTY(VisibleAnywhere)
+	bool CanSpawn = false;
+	
 	//Zombies Abilities
 	UPROPERTY(EditAnywhere, Category = "Setup")
 	float AttackDistance = 150.f;
 	UPROPERTY(EditAnywhere, Category = "Setup")
 	float DamageAmount = 10.f; 
 	UPROPERTY(EditAnywhere, Category = "Setup")
-	float Velocity = 250.f;
+	float Speed = 250.f;
 
-	//Attack Timer
+	//Timers
 	UPROPERTY(VisibleAnywhere, Category= "Timer")
 	float AttackTimer = 0.f;
 	UPROPERTY(EditAnywhere, Category= "Timer")
 	float AttackDelay = 2.5f;
+	UPROPERTY(VisibleAnywhere, Category= "Timer")
+	float DyingTimer = 0.f;
+	UPROPERTY(EditAnywhere, Category= "Timer")
+	float DyingDelay = 10.f;
 
 	//AI Controller
 	UPROPERTY(EditAnywhere, Category= "Setup")
@@ -42,6 +50,18 @@ public:
 	//Components
 	UPROPERTY(EditAnywhere, Category = "Setup")
 	UHealthComponent* HealthComponent;
+
+	//Animations
+	UPROPERTY()
+	class UZombieAnim* Animations;
+
+	//Audio Management
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+	UAudioComponent* AudioComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+	USoundCue* AttackSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+	USoundCue* GrowningSound;
 	
 protected:
 	// Called when the game starts or when spawned
@@ -50,6 +70,7 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	void ManageTimers(float DeltaTime);
 	FORCEINLINE int SetObjToSearch() {return ObjToSearch = FMath::RandRange(1,2);}
 	void Move(FVector Destination);
 	void SearchObj(int Objective);

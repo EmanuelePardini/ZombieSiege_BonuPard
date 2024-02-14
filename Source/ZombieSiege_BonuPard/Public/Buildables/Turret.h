@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Buildable.h"
-#include "ItemData.h"
+#include "Interfaces/Buildable.h"
+#include "Items/ItemData.h"
 #include "GameFramework/Actor.h"
 #include "Turret.generated.h"
 

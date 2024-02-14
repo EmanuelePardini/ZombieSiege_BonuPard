@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "ZombieSpawner.h"
 #include "GameFramework/Actor.h"
+#include "Sound/SoundCue.h"
 #include "ZombiesRounds.generated.h"
 
 UCLASS()
@@ -29,6 +30,14 @@ public:
 	int ZombiesSpawnedThisRound = 0;
 	UPROPERTY(VisibleAnywhere)
 	int ZombiesKilledThisRound = 0;
+	
+	//Audio Management
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+	UAudioComponent* AudioComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+	USoundCue* RoundEndSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+	USoundCue* LastZombieSound;
 
 	//Timer Management
 	UPROPERTY(EditAnywhere, Category = "Setup")

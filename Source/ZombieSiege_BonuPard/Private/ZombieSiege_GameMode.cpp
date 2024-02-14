@@ -10,7 +10,11 @@
 
 AZombieSiege_GameMode::AZombieSiege_GameMode()
 {
-	
+	//Audio Settings
+	AudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComponent"));
+	AudioComponent->bAutoActivate = true;
+	AudioComponent->VolumeMultiplier = 0.1f;
+	AudioComponent->OnAudioFinished.AddDynamic(this, &AZombieSiege_GameMode::OnAudioFinished);
 }
 
 void AZombieSiege_GameMode::BeginPlay()
@@ -18,6 +22,13 @@ void AZombieSiege_GameMode::BeginPlay()
 	Super::BeginPlay();
 	
 	InitPlayers();
+	AudioComponent->SetSound(Soundtrack);
+	AudioComponent->Play();
+}
+
+void AZombieSiege_GameMode::OnAudioFinished()
+{
+	AudioComponent->Play();
 }
 
 void AZombieSiege_GameMode::InitPlayers()

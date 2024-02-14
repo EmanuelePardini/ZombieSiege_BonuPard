@@ -1,9 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "LineTraceComponent.h"
+#include "Components/LineTraceComponent.h"
 
-#include "BuyableItem.h"
+#include "Items/BuyableItem.h"
 #include "CustomHUD.h"
 #include "Character/SurvivorCharacter.h"
 #include "Character/SurvivorController.h"

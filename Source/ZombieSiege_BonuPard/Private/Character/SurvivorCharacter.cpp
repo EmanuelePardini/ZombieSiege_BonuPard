@@ -3,7 +3,7 @@
 
 #include "ZombieSiege_BonuPard/Public/Character/SurvivorCharacter.h"
 
-#include "BuildSystem.h"
+#include "Components/BuildSystem.h"
 #include "Components/AudioComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Interfaces/SpawnInterface.h"
@@ -39,7 +39,6 @@ void ASurvivorCharacter::BeginPlay()
 
 	//Animation Settings
 	Animations = Cast<USurvivorAnim>(GetMesh()->GetAnimInstance());
-	
 }
 
 void ASurvivorCharacter::Move(const FInputActionValue& Value)

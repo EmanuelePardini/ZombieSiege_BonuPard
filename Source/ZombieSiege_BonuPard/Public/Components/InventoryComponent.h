@@ -1,8 +1,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "InventorySlot.h"
-#include "ItemData.h"
+#include "Items/InventorySlot.h"
+#include "Items/ItemData.h"
 #include "Components/ActorComponent.h"
 #include "InventoryComponent.generated.h"
 

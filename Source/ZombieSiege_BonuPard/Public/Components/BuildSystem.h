@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "InventoryComponent.h"
-#include "Turret.h"
+#include "Buildables/Turret.h"
 #include "Camera/CameraComponent.h"
 #include "Components/ActorComponent.h"
 #include "BuildSystem.generated.h"

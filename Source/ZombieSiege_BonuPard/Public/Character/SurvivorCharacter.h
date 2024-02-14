@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BuildSystem.h"
+#include "Components/BuildSystem.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
-#include "InventoryComponent.h"
-#include "LineTraceComponent.h"
+#include "Components/InventoryComponent.h"
+#include "Components/LineTraceComponent.h"
 #include "Interfaces/SpawnInterface.h"
 #include "Animations/SurvivorAnim.h"
 #include "Components/HealthComponent.h"

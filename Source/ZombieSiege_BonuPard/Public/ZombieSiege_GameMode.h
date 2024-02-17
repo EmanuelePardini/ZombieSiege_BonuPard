@@ -18,7 +18,7 @@ public:
 	AZombieSiege_GameMode();
 	
 	UPROPERTY(EditAnywhere)
-	bool isCoop = true; //To switch by single and multiplayer
+	bool IsCoop = true; //To switch by single and multiplayer
 	UPROPERTY(EditAnywhere)
 	FPlatformUserId SecondUserId = 1;//On my x360 controller emulator i used the second slot, if needed change that
 	//Audio Management
@@ -30,6 +30,7 @@ public:
 	
 protected:
 	virtual void BeginPlay() override;
-	void OnAudioFinished();
+	UFUNCTION()
+	void RestartAudio();
 	virtual void InitPlayers(); 
 };

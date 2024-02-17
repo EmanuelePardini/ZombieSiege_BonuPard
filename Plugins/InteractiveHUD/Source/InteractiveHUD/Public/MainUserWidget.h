@@ -22,10 +22,24 @@ protected:
 	UPROPERTY(EditAnywhere, meta=(BindWidget))
 	UTextBlock* TopLeftLabel;
 
+	UPROPERTY(EditAnywhere, meta=(BindWidget))
+	UTextBlock* TopRightLabel;
+
+	UPROPERTY(EditAnywhere, meta=(BindWidget))
+	UTextBlock* BottomLeftLabel;
+	
+	UPROPERTY(EditAnywhere, meta=(BindWidget))
+	UTextBlock* BottomRightLabel;
+
+	UPROPERTY(EditAnywhere, meta=(BindWidget))
+	UTextBlock* BottomRightLabel2;
 
 public:
 	void SetInteractionLabelContent(const FText& Text);
 
 	void SetTopLeftTextContent(const FText& Text);
-	
+	void SetTopRightTextContent(const FText& Text);
+	void SetBottomLeftTextContent(const FText& Text);
+	void SetBottomRightTextContent(const FText& Text);
+	void SetBottomRightTextContent2(const FText& Text);
 };

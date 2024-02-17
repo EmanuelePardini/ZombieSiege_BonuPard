@@ -24,5 +24,5 @@ class ZOMBIESIEGE_BONUPARD_API ISpawnInterface
 public:
 
 	virtual void Spawn(FVector Location){};
-	virtual void Die(){}; //TODO: Implement all Die functions
+	virtual void Die(){};
 };

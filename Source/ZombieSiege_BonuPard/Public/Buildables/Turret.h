@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Interfaces/Buildable.h"
+#include "Interfaces/InteractableInterface.h"
 #include "Items/ItemData.h"
-#include "GameFramework/Actor.h"
 #include "Turret.generated.h"
 
 USTRUCT(BlueprintType)
@@ -26,17 +26,8 @@ struct FAIDataForSightConfig
 	mutable float AIFieldOfView;
 };
 
-UENUM(BlueprintType)
-enum class ETurretLevel : uint8
-{
-	Level1,
-	Level2,
-	Level3
-};
-
-
 UCLASS()
-class ZOMBIESIEGE_BONUPARD_API ATurret : public APawn, public IBuildable
+class ZOMBIESIEGE_BONUPARD_API ATurret : public APawn, public IBuildable, public IInteractableInterface
 {
 	GENERATED_BODY()
 
@@ -63,6 +54,9 @@ public:
 
 	UPROPERTY(EditAnywhere, Category="Turret")
 	ETurretLevel TurretLevel;
+
+	UPROPERTY(EditAnywhere, Category="Turret")
+	FItemLevelData LevelData;
 
 	/**
 	 * @brief Reference to the data table used for item information.
@@ -100,6 +94,11 @@ public:
 	void Sell();
 	void Upgrade();
 
+	FText Interact(AActor* Interactor) override;
+
+	void SetupTurret();
 	void Build();
-	const FAIDataForSightConfig* GetAIData() const;
+	void SetupLevel(ETurretLevel Level);
+	const FAIDataForSightConfig* GetAIData();
+	FItemLevelData GetLevelData() const { return ItemData.Levels[TurretLevel]; }
 };

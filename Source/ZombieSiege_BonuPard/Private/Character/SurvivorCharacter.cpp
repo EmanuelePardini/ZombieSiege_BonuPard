@@ -3,10 +3,12 @@
 
 #include "ZombieSiege_BonuPard/Public/Character/SurvivorCharacter.h"
 
+#include "ZombieSiege_GameMode.h"
 #include "Components/BuildSystem.h"
 #include "Components/AudioComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Interfaces/SpawnInterface.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ASurvivorCharacter::ASurvivorCharacter()
@@ -43,7 +45,7 @@ void ASurvivorCharacter::BeginPlay()
 
 void ASurvivorCharacter::Move(const FInputActionValue& Value)
 {
-	if(!IsShooting && !IsReloading)
+	if(!IsShooting && !IsReloading && !IsDied)
 	{
 		// Obtains the controller's rotation and create a rotation on the yaw axis
 		FVector2d MovementValue = Value.Get<FVector2d>();
@@ -62,16 +64,19 @@ void ASurvivorCharacter::Move(const FInputActionValue& Value)
 
 void ASurvivorCharacter::Look(const FInputActionValue& Value)
 {
-	FVector2d LookValue = Value.Get<FVector2d>();
+	if(!IsDied)
+	{
+		FVector2d LookValue = Value.Get<FVector2d>();
 	
-	// Adds input to control the rotation
-	AddControllerYawInput(LookValue.X);
-	AddControllerPitchInput(LookValue.Y);
+		// Adds input to control the rotation
+		AddControllerYawInput(LookValue.X);
+		AddControllerPitchInput(LookValue.Y);
+	}
 }
 
 void ASurvivorCharacter::DoJump(const FInputActionValue& Value)
 {
-	if(!IsCrouched && !IsAiming)
+	if(!IsCrouched && !IsAiming && !IsDied)
 	{
 		Jump();
 	}
@@ -79,7 +84,7 @@ void ASurvivorCharacter::DoJump(const FInputActionValue& Value)
 
 void ASurvivorCharacter::Run(const FInputActionValue& Value)
 {
-	if(!IsCrouched && !IsAiming)
+	if(!IsCrouched && !IsAiming && !IsDied)
 	{
 		GetCharacterMovement()->MaxWalkSpeed = 600.f;
 		Animations->IsRunning = true;
@@ -96,7 +101,7 @@ void ASurvivorCharacter::EndRun(const FInputActionValue& Value)
 
 void ASurvivorCharacter::Crouch(const FInputActionValue& Value)
 {
-	if(!IsRunning && !IsAiming)
+	if(!IsRunning && !IsAiming && !IsDied)
 	{
 		GetCharacterMovement()->MaxWalkSpeed = 250.f;
 		IsCrouched = true;
@@ -106,7 +111,7 @@ void ASurvivorCharacter::Crouch(const FInputActionValue& Value)
 
 void ASurvivorCharacter::UnCrouch(const FInputActionValue& Value)
 {
-	if(!IsAiming)
+	if(!IsAiming && !IsDied)
 	{
 		GetCharacterMovement()->MaxWalkSpeed = 400.f;
 		IsCrouched = false;
@@ -116,7 +121,7 @@ void ASurvivorCharacter::UnCrouch(const FInputActionValue& Value)
 
 void ASurvivorCharacter::Aim(const FInputActionValue& Value)
 {
-	if(!IsRunning && !IsReloading)
+	if(!IsRunning && !IsReloading && !IsDied)
 	{
 		IsAiming = true;
 		Animations->IsAiming = true;
@@ -136,7 +141,7 @@ void ASurvivorCharacter::StopAim(const FInputActionValue& Value)
 
 void ASurvivorCharacter::Shoot(const FInputActionValue& Value)
 {
-	if(IsAiming && ProjectileComponent->ActualAmmo > 0)
+	if(IsAiming && ProjectileComponent->ActualAmmo > 0 && !IsDied)
 	{ //If is aiming and has ammo then can shoot
 		if(!IsShooting) //If is starting to shoot now play the sound only one time
 		{
@@ -163,7 +168,7 @@ void ASurvivorCharacter::StopShoot(const FInputActionValue& Value)
 
 void ASurvivorCharacter::Reload(const FInputActionValue& Value)
 {
-	if(ProjectileComponent->ActualAmmo < ProjectileComponent->LoaderAmmo)
+	if(ProjectileComponent->ActualAmmo < ProjectileComponent->LoaderAmmo && !IsDied)
 	{
 		StopShoot(true);
 		StopAim(true);
@@ -186,31 +191,38 @@ void ASurvivorCharacter::ManageReload(float DeltaTime)
 
 void ASurvivorCharacter::ToggleBuild(const FInputActionValue& Value)
 {
-	if (auto* BuildSystem = GetComponentByClass<UBuildSystem>())
+	if(!IsDied)
 	{
-		BuildSystem->ToggleBuildMode();
+		if (auto* BuildSystem = GetComponentByClass<UBuildSystem>()) BuildSystem->ToggleBuildMode();
 	}
+	
 }
 
 void ASurvivorCharacter::Build(const FInputActionValue& Value)
 {
-	if (auto* BuildSystem = GetComponentByClass<UBuildSystem>())
+	if(!IsDied)
 	{
-		BuildSystem->Build();
+		if (auto* BuildSystem = GetComponentByClass<UBuildSystem>()) BuildSystem->Build();
 	}
+	
 }
 
 void ASurvivorCharacter::SwapBuildable(const FInputActionValue& InputActionValue)
 {
-	if (auto* BuildSystem = GetComponentByClass<UBuildSystem>())
+	if(!IsDied)
 	{
-		BuildSystem->SwapBuildable(InputActionValue.Get<float>());
+		if (auto* BuildSystem = GetComponentByClass<UBuildSystem>())  BuildSystem->SwapBuildable(InputActionValue.Get<float>());
 	}
+	
 }
 
 void ASurvivorCharacter::Interact(const FInputActionValue& Value)
 {
-	GetComponentByClass<ULineTraceComponent>()->Interact();
+	if(!IsDied)
+	{
+		GetComponentByClass<ULineTraceComponent>()->Interact();
+	}
+	
 }
 
 void ASurvivorCharacter::Drop(const FInputActionValue& Value)
@@ -237,9 +249,50 @@ void ASurvivorCharacter::Tick(float DeltaTime)
 void ASurvivorCharacter::Spawn(FVector Location)
 {
 	ISpawnInterface::Spawn(Location);
+	IsDied = false;
+	SetActorHiddenInGame(false);
+	SetActorEnableCollision(true);
+	HealthComponent->Health = HealthComponent->MaxHealth;
 }
 
 void ASurvivorCharacter::Die()
 {
 	ISpawnInterface::Die();
+	
+	UWorld* World = GetWorld();
+	
+	if (World)
+	{
+		AZombieSiege_GameMode* GameMode = Cast<AZombieSiege_GameMode>(World->GetAuthGameMode());
+			if(GameMode && GameMode->IsCoop && IsAnyOneAlive())
+			{
+				IsDied = true;
+				SetActorHiddenInGame(true);
+				SetActorEnableCollision(false);
+			}
+			else
+			{
+				//GameOver
+			}
+	}
+}
+
+bool ASurvivorCharacter::IsAnyOneAlive()
+{
+	UWorld* World = GetWorld();
+	TArray<AActor*> FoundSurvivorCharacters;
+	bool IsAnyoneAlive = false;
+	
+	UGameplayStatics::GetAllActorsOfClass(World, ASurvivorCharacter::StaticClass(), FoundSurvivorCharacters);
+				
+	for (AActor* Actor : FoundSurvivorCharacters)
+	{
+		ASurvivorCharacter* SurvivorCharacter = Cast<ASurvivorCharacter>(Actor);
+		if (!SurvivorCharacter->IsDied)
+		{
+			IsAnyoneAlive = true;
+		}
+	}
+
+	return IsAnyoneAlive;
 }

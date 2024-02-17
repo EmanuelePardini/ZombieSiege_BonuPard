@@ -34,5 +34,6 @@ void AShelter::Spawn(FVector Location)
 void AShelter::Die()
 {
 	ISpawnInterface::Die();
+	//Game Over
 }
 

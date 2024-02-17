@@ -51,7 +51,9 @@ public:
 	bool IsShooting = false;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	bool IsReloading = false;
-
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	bool IsDied = false;
+	
 	//Timers
 	UPROPERTY(EditAnywhere, Category = "Setup")
 	float ReloadDelay = 2.f;
@@ -109,4 +111,5 @@ public:
 
 	virtual void Spawn(FVector Location) override;
 	virtual void Die() override;
+	bool IsAnyOneAlive();
 };

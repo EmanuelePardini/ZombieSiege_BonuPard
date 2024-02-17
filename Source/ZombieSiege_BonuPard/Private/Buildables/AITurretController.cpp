@@ -73,6 +73,7 @@ void AAITurretController::Tick(float DeltaSeconds)
 	UpdateTurretRotation(DeltaSeconds);
 }
 
+//TODO: Set Enemy Tag
 void AAITurretController::OnPerceptionUpdated(const TArray<AActor*>& UpdatedActors)
 {
 	AActor* ClosestActor = nullptr;

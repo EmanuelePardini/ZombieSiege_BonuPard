@@ -3,6 +3,7 @@
 
 #include "Enemies/ZombiesNPC.h"
 
+#include "EngineUtils.h"
 #include "Animations/ZombieAnim.h"
 #include "Enemies/ZombiesRounds.h"
 #include "Components/HealthComponent.h"
@@ -95,35 +96,37 @@ void AZombiesNPC::SearchObj(int Objective)
 	float NearestDistanceSq = FLT_MAX;
 
 	if (Objective == 1) //Search Players
+	{
+		for (TActorIterator<ASurvivorCharacter> It(GetWorld(), ASurvivorCharacter::StaticClass()); It; ++It)
 		{
-		TArray<AActor*> FoundPlayers;
-		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASurvivorCharacter::StaticClass(), FoundPlayers);
-
-		for (AActor* Player : FoundPlayers)
-		{
-			float DistanceSq = FVector::DistSquared(GetActorLocation(), Player->GetActorLocation());
-			if (DistanceSq < NearestDistanceSq)
+			ASurvivorCharacter* Survivor = *It;
+			if (Survivor && !Survivor->IsDied)
 			{
-				NearestObj = Player;
-				NearestDistanceSq = DistanceSq;
+				float DistanceSq = FVector::DistSquared(GetActorLocation(), Survivor->GetActorLocation());
+				if (DistanceSq < NearestDistanceSq)
+				{
+					NearestObj = Survivor;
+					NearestDistanceSq = DistanceSq;
+				}
 			}
 		}
-		}
+	}
 	else if (Objective == 2) //Search Shelters
+	{
+		for (TActorIterator<AShelter> It(GetWorld(), AShelter::StaticClass()); It; ++It)
 		{
-		TArray<AActor*> FoundShelters;
-		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AShelter::StaticClass(), FoundShelters);
-
-		for (AActor* Shelter : FoundShelters)
-		{
-			float DistanceSq = FVector::DistSquared(GetActorLocation(), Shelter->GetActorLocation());
-			if (DistanceSq < NearestDistanceSq)
+			AShelter* Shelter = *It;
+			if (Shelter)
 			{
-				NearestObj = Shelter;
-				NearestDistanceSq = DistanceSq;
+				float DistanceSq = FVector::DistSquared(GetActorLocation(), Shelter->GetActorLocation());
+				if (DistanceSq < NearestDistanceSq)
+				{
+					NearestObj = Shelter;
+					NearestDistanceSq = DistanceSq;
+				}
 			}
 		}
-		}
+	}
 	
 	if (NearestObj)
 	{
@@ -140,14 +143,13 @@ void AZombiesNPC::SearchObj(int Objective)
 
 void AZombiesNPC::Attack(AActor* AttackedActor)
 {
-		AudioComponent->SetSound(AttackSound);
-		AudioComponent->Play();
-		Animations->IsAttacking = true;
-	
 		UHealthComponent* HealthComp = Cast<UHealthComponent>(AttackedActor->GetComponentByClass(UHealthComponent::StaticClass()));
 		AZombiesNPC* Zombie = Cast<AZombiesNPC>(AttackedActor);
 		if (HealthComp && AttackTimer>=AttackDelay && !Zombie)
 		{
+			AudioComponent->SetSound(AttackSound);
+			AudioComponent->Play();
+			Animations->IsAttacking = true;
 			HealthComp->DecrementHealth(DamageAmount);
 			AttackTimer = 0.f;
 		}
@@ -172,11 +174,12 @@ void AZombiesNPC::Die()
 {
 	ISpawnInterface::Die();
 	
-	//Update the Zombie killed for the round counter
+	// //Update the Zombie killed for the round counter
 	AZombiesRounds* Round = Cast<AZombiesRounds>(UGameplayStatics::GetActorOfClass(GetWorld(), AZombiesRounds::StaticClass()));
-	if(Round && !IsDied) Round->ZombiesKilledThisRound++;
-	
+	if(Round && !IsDied) Round->IncrementZombieDied();
+
 	//That notify that the Zombie is ready for another use
 	IsDied = true;
+	
 }
 

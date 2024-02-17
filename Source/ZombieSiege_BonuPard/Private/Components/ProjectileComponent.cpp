@@ -64,10 +64,16 @@ void UProjectileComponent::Shoot()
 		{
 			AActor* HittedActor = Hit.GetActor();
 			AZombiesNPC* Enemy = Cast<AZombiesNPC>(HittedActor);
-		
-			if(Enemy)
+			if(HittedActor != GetOwner())
 			{
-				Enemy->HealthComponent->DecrementHealth(DamageAmount);
+				if(Enemy)
+				{
+					Enemy->HealthComponent->DecrementHealth(DamageAmount);
+				}
+				else
+				{
+					break;
+				}
 			}
 		}
 	}

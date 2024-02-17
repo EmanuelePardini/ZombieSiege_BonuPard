@@ -2,7 +2,6 @@
 
 
 #include "Components/LineTraceComponent.h"
-
 #include "Items/BuyableItem.h"
 #include "CustomHUD.h"
 #include "Character/SurvivorCharacter.h"
@@ -36,7 +35,7 @@ void ULineTraceComponent::BeginPlay()
 
 	if (ASurvivorCharacter* Owner = GetOwner<ASurvivorCharacter>())
 	{
-		UCameraComponent* CameraComponent = Cast<UCameraComponent>(Owner->GetComponentByClass(UCameraComponent::StaticClass()));
+		UCameraComponent* CameraComponent = Cast<UCameraComponent>(Owner->GetComponentByClass<UCameraComponent>());
 		if (CameraComponent)
 		{
 			Camera = CameraComponent;
@@ -57,11 +56,25 @@ void ULineTraceComponent::Interact() const
 {
 	auto [Hits, _Start, _End, _Params] = DoLineTrace(false);
 	ASurvivorCharacter* Owner = GetOwner<ASurvivorCharacter>();
-	for (FHitResult Hit: Hits)
+	for (const FHitResult& Hit : Hits)
 	{
-		ABuyableItem* Interactable = Cast<ABuyableItem>(Hit.GetActor());
-		if (!Interactable) continue;
-		Interactable->Buy(Owner);
+		AActor* HitActor = Hit.GetActor();
+		if (!HitActor) continue;
+		if (HitActor->GetClass()->ImplementsInterface(UInteractableInterface::StaticClass()))
+		{
+			IInteractableInterface* Interactable = Cast<IInteractableInterface>(HitActor);
+			if (Interactable)
+			{
+				FText InteractionLabel = Interactable->Interact(Owner);
+				ASurvivorController* Controller = Cast<ASurvivorController>(Owner->GetController());
+				if (!Controller) return;
+				ACustomHUD* HUD = Cast<ACustomHUD>(Controller->GetHUD());
+				if (HUD)
+				{
+					HUD->SetLabelText(InteractionLabel);
+				}
+			}
+		}
 	}
 }
 
@@ -72,8 +85,8 @@ void ULineTraceComponent::IsInteractable() const
 	if (!Context || !Owner) return;
 
 	auto [Hits, _Start, _End, _Params] = DoLineTrace(false);
-
-	ACustomHUD* HUD = Cast<ACustomHUD>(Context->GetFirstPlayerController()->GetHUD());
+	ASurvivorController* Controller = Cast<ASurvivorController>(Owner->GetController());
+	ACustomHUD* HUD = Cast<ACustomHUD>(Controller->GetHUD());
 	TArray<FEnhancedActionKeyMapping> Mappings = Cast<ASurvivorController>(Owner->GetController())->IMC->GetMappings();
 	FString ActionKey;
 

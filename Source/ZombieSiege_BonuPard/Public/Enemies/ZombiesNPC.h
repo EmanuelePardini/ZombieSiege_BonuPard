@@ -27,7 +27,7 @@ public:
 	
 	//Zombies Abilities
 	UPROPERTY(EditAnywhere, Category = "Setup")
-	float AttackDistance = 150.f;
+	float AttackDistance = 200.f;
 	UPROPERTY(EditAnywhere, Category = "Setup")
 	float DamageAmount = 10.f; 
 	UPROPERTY(EditAnywhere, Category = "Setup")

@@ -35,7 +35,7 @@ public:
 	int LoaderAmmo = 50;
 	UPROPERTY()
 	int ActualAmmo = LoaderAmmo;
-	//TODO: Ammo Packs and total ammo?
+	
 	// UPROPERTY(EditAnywhere, Category = "Setup")
 	// int TotalAmmo = LoaderAmmo * 10;
 	UPROPERTY(EditAnywhere, Category ="Setup")

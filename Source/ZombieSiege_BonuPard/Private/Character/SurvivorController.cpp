@@ -4,11 +4,33 @@
 #include "Character/SurvivorController.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Blueprint/UserWidget.h"
 #include "Character/SurvivorInputData.h"
 
 void ASurvivorController::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void ASurvivorController::SetUpHUD(FVector2D Position, FVector2D Size)
+{
+	if (HUDClass != nullptr) {
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		ACustomHUD* NewHUD = GetWorld()->SpawnActor<ACustomHUD>(HUDClass, SpawnParams);
+
+		if (NewHUD != nullptr) {
+			PlayerHUD = NewHUD;
+		}
+	}
+	
+	if (IsLocalPlayerController() && PlayerHUD)
+	{
+			PlayerHUD->MainUserWidget->SetPositionInViewport(Position);
+			PlayerHUD->MainUserWidget->SetDesiredSizeInViewport(Size);
+			
+			PlayerHUD->MainUserWidget->AddToViewport();
+	}
 }
 
 void ASurvivorController::AssignPlayersIMC()

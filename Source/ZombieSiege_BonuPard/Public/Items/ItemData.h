@@ -23,11 +23,19 @@ struct FItemLevelData
 	float Price;
 };
 
+UENUM(BlueprintType)
+enum class ETurretLevel : uint8
+{
+	Level1,
+	Level2,
+	Level3
+};
+
 USTRUCT(BlueprintType)
 struct ZOMBIESIEGE_BONUPARD_API FItemData : public FTableRowBase
 {
 	GENERATED_BODY()
-	
+    
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
 	FName ItemID;
 
@@ -36,6 +44,9 @@ struct ZOMBIESIEGE_BONUPARD_API FItemData : public FTableRowBase
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
 	FString Description;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
+	int Price;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
 	bool bIsStackable;
@@ -47,14 +58,14 @@ struct ZOMBIESIEGE_BONUPARD_API FItemData : public FTableRowBase
 	TSoftObjectPtr<UStaticMesh> PreviewMesh;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Levels")
-	TMap<FString, FItemLevelData> Levels;
+	TMap<ETurretLevel, FItemLevelData> Levels;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI")
 	float AISightRadius;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI")
 	float AISightAge;
-	
+    
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI")
 	float AILoseSightRadius;
 

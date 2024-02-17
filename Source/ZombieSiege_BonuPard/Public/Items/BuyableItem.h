@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Interfaces/InteractableInterface.h"
 #include "GameFramework/Actor.h"
 #include "ItemData.h"
 #include "Engine/DataTable.h"
@@ -10,11 +11,11 @@
  * @brief Serves as a base class for interactable items.
  */
 UCLASS(Blueprintable)
-class ZOMBIESIEGE_BONUPARD_API ABuyableItem : public AActor
+class ZOMBIESIEGE_BONUPARD_API ABuyableItem : public AActor, public IInteractableInterface
 {
 	GENERATED_BODY()
-	
-public:	
+    
+public:    
 	ABuyableItem();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -32,7 +33,7 @@ public:
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
 	FName RowName;
-	
+    
 	/**
 	 * @brief Cached item data
 	 */
@@ -48,10 +49,10 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-public:	
+public:    
 	virtual void Tick(float DeltaTime) override;
 
-	void Buy(AActor* Buyer);
+	virtual FText Interact(AActor* Interactor) override;
 
 	/**
 	 * @brief Called when RowName or DataTableReference is changed to automatically update the item data.
@@ -61,4 +62,3 @@ public:
 
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 };
-

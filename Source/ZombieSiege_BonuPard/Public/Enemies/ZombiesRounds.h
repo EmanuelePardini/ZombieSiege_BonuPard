@@ -8,7 +8,10 @@
 #include "Sound/SoundCue.h"
 #include "ZombiesRounds.generated.h"
 
-UCLASS()
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnZombieKilled, int, Amount);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRoundEnd, int, Amount);
+
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ZOMBIESIEGE_BONUPARD_API AZombiesRounds : public AActor
 {
 	GENERATED_BODY()
@@ -21,6 +24,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Setup")
 	TArray<AZombieSpawner*> Spawners;
 
+	
 	//Round Management
 	UPROPERTY(VisibleAnywhere)
 	int ActualRound = 0;
@@ -50,6 +54,15 @@ public:
 	float RoundDelay = 10.f;
 	UPROPERTY(VisibleAnywhere)
 	bool IsIntoRound = true;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnZombieKilled OnZombieKilled;
+	UPROPERTY(BlueprintAssignable)
+	FOnRoundEnd OnRoundEnd;
+	UPROPERTY(EditAnywhere, Category = "Setup")
+	int KillReward = 50;
+	UPROPERTY(EditAnywhere, Category = "Setup")
+	int RoundReward = 1000;
 	
 protected:
 	// Called when the game starts or when spawned
@@ -60,6 +73,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	void Init();
 	void ManageRound(float DeltaTime);
+	void IncrementZombieDied();
 	void ActivateZombies();
 	void TerminateRound();
 	void EndGame();

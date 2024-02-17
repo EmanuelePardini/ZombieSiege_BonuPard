@@ -3,9 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CustomHUD.h"
 #include "SurvivorCharacter.h"
 #include "GameFramework/PlayerController.h"
-#include "GameFramework/PlayerStart.h"
+#include "Blueprint/UserWidget.h"
 #include "SurvivorController.generated.h"
 
 /**
@@ -18,6 +19,12 @@ class ZOMBIESIEGE_BONUPARD_API ASurvivorController : public APlayerController
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Setup")
 	class UInputMappingContext* IMC;
+
+	//For HUD
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="HUD")
+	ACustomHUD* PlayerHUD;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="HUD")
+	TSubclassOf<AHUD> HUDClass;
 
 protected:
 	//For Inputs
@@ -40,6 +47,7 @@ protected:
 	virtual void BeginPlay() override;
 	
 public:
+	void SetUpHUD(FVector2D Position, FVector2D Size);
 	void AssignPlayersIMC();
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void SetupInputComponent() override;

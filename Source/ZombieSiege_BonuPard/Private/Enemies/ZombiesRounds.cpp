@@ -3,7 +3,9 @@
 
 #include "Enemies/ZombiesRounds.h"
 
+#include "Character/SurvivorCharacter.h"
 #include "Components/AudioComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AZombiesRounds::AZombiesRounds()
@@ -69,6 +71,12 @@ void AZombiesRounds::ManageRound(float DeltaTime)
 	}
 }
 
+void AZombiesRounds::IncrementZombieDied()
+{
+	ZombiesKilledThisRound++;
+	OnZombieKilled.Broadcast(KillReward);
+}
+
 void AZombiesRounds::ActivateZombies()
 { //For any spawners spawn [Actual Round] Zombies
 	for(auto& Spawner : Spawners)
@@ -99,11 +107,25 @@ void AZombiesRounds::TerminateRound()
 	ZombiesKilledThisRound = 0;
 	if(ActualRound < ZombiesxRounds.Num()-1)
 	{
+		OnRoundEnd.Broadcast(RoundReward);
 		ActualRound++;
 	}
 	else
 	{
 		EndGame();
+	}
+
+	TArray<AActor*> FoundSurvivors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASurvivorCharacter::StaticClass(), FoundSurvivors);
+
+	//Respawn/Reset Health to Survivors
+	for (AActor* Actor : FoundSurvivors)
+	{
+		ASurvivorCharacter* Survivor = Cast<ASurvivorCharacter>(Actor);
+		if (Survivor)
+		{
+			Survivor->Spawn(Survivor->GetActorLocation());
+		}
 	}
 	
 }

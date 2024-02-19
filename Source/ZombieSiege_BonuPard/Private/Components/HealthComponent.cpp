@@ -3,6 +3,8 @@
 
 #include "Components/HealthComponent.h"
 
+#include "Character/SurvivorCharacter.h"
+#include "Character/SurvivorController.h"
 #include "Interfaces/SpawnInterface.h"
 
 // Sets default values for this component's properties
@@ -15,16 +17,18 @@ UHealthComponent::UHealthComponent()
 	// ...
 }
 
+void UHealthComponent::SetupInitialHealth()
+{
+	Health = MaxHealth;
+	OnHealthChanged.Broadcast(Health);
+}
 
 // Called when the game starts
 void UHealthComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// ...
-	
+	OnHealthChanged.Broadcast(Health);
 }
-
 
 // Called every frame
 void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -41,6 +45,7 @@ void UHealthComponent::DecrementHealth(float DamageAmount)
 	{
 		Die();
 	}
+		OnHealthChanged.Broadcast(Health);
 }
 
 void UHealthComponent::IncrementHealth(float RecoverAmount)
@@ -55,6 +60,7 @@ void UHealthComponent::IncrementHealth(float RecoverAmount)
 	{
 		Health = MaxHealth;
 	}
+		OnHealthChanged.Broadcast(Health);
 }
 
 void UHealthComponent::Die()

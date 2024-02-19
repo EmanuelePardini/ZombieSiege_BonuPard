@@ -25,7 +25,7 @@ public class InteractiveHUD : ModuleRules
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"Core",
+				"Core", "ZombieSiege_BonuPard",
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);

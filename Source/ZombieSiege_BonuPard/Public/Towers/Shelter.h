@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Interfaces/SpawnInterface.h"
 #include "Components/HealthComponent.h"
+#include "Components/TextRenderComponent.h"
 #include "GameFramework/Actor.h"
 #include "Shelter.generated.h"
 
@@ -19,6 +20,9 @@ public:
 	
 	UPROPERTY(EditAnywhere, Category = "Setup")
 	UHealthComponent* HealthComponent;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
+	UTextRenderComponent* HealthText;
 	
 protected:
 	// Called when the game starts or when spawned

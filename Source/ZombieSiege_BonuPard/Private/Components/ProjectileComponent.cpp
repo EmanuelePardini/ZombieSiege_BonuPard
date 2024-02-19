@@ -13,8 +13,14 @@ UProjectileComponent::UProjectileComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 	
+	
 }
 
+void UProjectileComponent::SetupInitialAmmo()
+{
+	ActualAmmo = LoaderAmmo;
+	OnAmmoChanged.Broadcast(ActualAmmo);
+}
 
 // Called when the game starts
 void UProjectileComponent::BeginPlay()
@@ -48,11 +54,11 @@ void UProjectileComponent::Shoot()
 	{
 		CanShoot = false;
 		ActualAmmo--;
-		
+		OnAmmoChanged.Broadcast(ActualAmmo);
 		//Variables Declaration
 		UWorld* Context = GetWorld();
-		ASurvivorCharacter* Owner = Cast<ASurvivorCharacter>(GetOwner());
-		FVector Start = WeaponComponent->GetComponentLocation();
+		AActor* Owner = GetOwner();
+		FVector Start = WeaponComponent ? WeaponComponent->GetComponentLocation() : Owner->GetActorLocation();
 		FVector End = Start + Owner->GetActorForwardVector() * ProjectileDistance;
 		TArray<FHitResult> Hits;
 
@@ -77,6 +83,12 @@ void UProjectileComponent::Shoot()
 			}
 		}
 	}
+}
+
+void UProjectileComponent::Recharge()
+{
+	ActualAmmo=LoaderAmmo;
+	OnAmmoChanged.Broadcast(ActualAmmo);
 }
 
 void UProjectileComponent::AttachProjectileLine()

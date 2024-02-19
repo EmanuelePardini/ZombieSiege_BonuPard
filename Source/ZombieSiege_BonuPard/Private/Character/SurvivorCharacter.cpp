@@ -29,9 +29,10 @@ ASurvivorCharacter::ASurvivorCharacter()
 	LineTraceComponent = CreateDefaultSubobject<ULineTraceComponent>("LineTraceComponent");
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>("InventoryComponent");
 	BuildSystemComponent = CreateDefaultSubobject<UBuildSystem>("BuildSystemComponent");
+	MoneySystemComponent = CreateDefaultSubobject<UMoneySystemComponent>("MoneySystemComponent");
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>("HealthComponent");
-	HealthComponent->MaxHealth = 50.f;
-	HealthComponent->Health = 50.f;
+	HealthComponent->MaxHealth = 50;
+	HealthComponent->Health = 50;
 }
 
 // Called when the game starts or when spawned
@@ -99,7 +100,7 @@ void ASurvivorCharacter::EndRun(const FInputActionValue& Value)
 	IsRunning = false;
 }
 
-void ASurvivorCharacter::Crouch(const FInputActionValue& Value)
+void ASurvivorCharacter::DoCrouch()
 {
 	if(!IsRunning && !IsAiming && !IsDied)
 	{
@@ -109,7 +110,7 @@ void ASurvivorCharacter::Crouch(const FInputActionValue& Value)
 	}
 }
 
-void ASurvivorCharacter::UnCrouch(const FInputActionValue& Value)
+void ASurvivorCharacter::DoUnCrouch()
 {
 	if(!IsAiming && !IsDied)
 	{
@@ -182,7 +183,7 @@ void ASurvivorCharacter::ManageReload(float DeltaTime)
 	ReloadTimer += DeltaTime;
 	if(ReloadTimer >= ReloadDelay)
 	{
-		ProjectileComponent->ActualAmmo = 30;
+		ProjectileComponent->Recharge();
 		Animations->IsReloading = false;
 		IsReloading = false;
 		ReloadTimer = 0;
@@ -252,7 +253,7 @@ void ASurvivorCharacter::Spawn(FVector Location)
 	IsDied = false;
 	SetActorHiddenInGame(false);
 	SetActorEnableCollision(true);
-	HealthComponent->Health = HealthComponent->MaxHealth;
+	HealthComponent->SetupInitialHealth();
 }
 
 void ASurvivorCharacter::Die()
@@ -264,16 +265,13 @@ void ASurvivorCharacter::Die()
 	if (World)
 	{
 		AZombieSiege_GameMode* GameMode = Cast<AZombieSiege_GameMode>(World->GetAuthGameMode());
-			if(GameMode && GameMode->IsCoop && IsAnyOneAlive())
-			{
-				IsDied = true;
-				SetActorHiddenInGame(true);
-				SetActorEnableCollision(false);
-			}
-			else
-			{
-				//GameOver
-			}
+		if(GameMode && GameMode->IsCoop)
+		{
+			IsDied = true;
+			SetActorHiddenInGame(true);
+			SetActorEnableCollision(false);
+		}
+		if(!IsAnyOneAlive()) UGameplayStatics::OpenLevel(this, "GameOverMap");
 	}
 }
 

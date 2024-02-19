@@ -11,6 +11,7 @@
 #include "Interfaces/SpawnInterface.h"
 #include "Animations/SurvivorAnim.h"
 #include "Components/HealthComponent.h"
+#include "Components/MoneySystemComponent.h"
 #include "Components/ProjectileComponent.h"
 #include "Sound/SoundCue.h"
 #include "SurvivorCharacter.generated.h"
@@ -35,6 +36,8 @@ public:
 	UInventoryComponent* InventoryComponent;
 	UPROPERTY(EditAnywhere, Category="Setup")
 	UBuildSystem* BuildSystemComponent;
+	UPROPERTY(EditAnywhere, Category = "Setup")
+	UMoneySystemComponent* MoneySystemComponent;
 	
 	//Animations Declaration
 	UPROPERTY()
@@ -84,8 +87,8 @@ public:
 	void EndRun(const FInputActionValue& Value);
 
 	//Crouch Manage
-	void Crouch(const FInputActionValue& Value);
-	void UnCrouch(const FInputActionValue& Value);
+	void DoCrouch();
+	void DoUnCrouch();
 
 	//Combat manage
 	void Aim(const FInputActionValue& Value);

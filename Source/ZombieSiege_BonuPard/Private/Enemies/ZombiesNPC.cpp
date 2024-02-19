@@ -24,11 +24,12 @@ AZombiesNPC::AZombiesNPC()
 	
 	//Health
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>("HealthComponent");
-	HealthComponent->MaxHealth = 50.f;
-	HealthComponent->Health = 50.f;
+	HealthComponent->MaxHealth = 50;
+	HealthComponent->Health = 50;
 
 	AudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComponent"));
 	AudioComponent->bAutoActivate = false;
+	Tags.Add(Tag);
 }
 
 // Called when the game starts or when spawned
@@ -87,7 +88,6 @@ void AZombiesNPC::Move(FVector Destination)
 			AudioComponent->SetSound(GrowningSound);
 			AudioComponent->Play();
 		}
-		
 }
 
 void AZombiesNPC::SearchObj(int Objective)
@@ -163,7 +163,7 @@ void AZombiesNPC::Spawn(FVector Location)
 	CanSpawn = false;
 	Animations->IsDying = false;
 	
-	HealthComponent->Health = HealthComponent->MaxHealth;
+	HealthComponent->IncrementHealth(HealthComponent->MaxHealth);
 	
 	SetActorLocation(Location);
 	SetActorHiddenInGame(false);
@@ -180,6 +180,5 @@ void AZombiesNPC::Die()
 
 	//That notify that the Zombie is ready for another use
 	IsDied = true;
-	
 }
 

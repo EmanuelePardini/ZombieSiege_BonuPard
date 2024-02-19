@@ -15,10 +15,13 @@ class ZOMBIESIEGE_BONUPARD_API UHealthComponent : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UHealthComponent();
+	void SetupInitialHealth();
 	UPROPERTY(EditAnywhere, Category = "Setup")
-	float Health = 5.f;
+	int Health = 5;
 	UPROPERTY(EditAnywhere, Category = "Setup")
-	float MaxHealth = 5.f;
+	int MaxHealth = 5;
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHealthChanged, int, NewHealthAmount);
+	FOnHealthChanged OnHealthChanged;
 	
 protected:
 	// Called when the game starts

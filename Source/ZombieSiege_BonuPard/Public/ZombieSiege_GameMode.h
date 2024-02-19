@@ -20,7 +20,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	bool IsCoop = true; //To switch by single and multiplayer
 	UPROPERTY(EditAnywhere)
-	FPlatformUserId SecondUserId = 1;//On my x360 controller emulator i used the second slot, if needed change that
+	int32 SecondUserId = 1;//On my x360 controller emulator i used the second slot, if needed change that
 	//Audio Management
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
 	UAudioComponent* AudioComponent;
@@ -32,5 +32,6 @@ protected:
 	virtual void BeginPlay() override;
 	UFUNCTION()
 	void RestartAudio();
+	UFUNCTION()
 	virtual void InitPlayers(); 
 };

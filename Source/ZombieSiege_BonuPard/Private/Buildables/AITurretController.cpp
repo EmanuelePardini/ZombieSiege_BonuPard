@@ -1,6 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Buildables/AITurretController.h"
+
+#include "Components/AudioComponent.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 
@@ -25,7 +27,6 @@ AAITurretController::AAITurretController()
 		AIPerceptionComponent->ConfigureSense(*SightConfig);
 		AIPerceptionComponent->OnPerceptionUpdated.AddDynamic(this, &AAITurretController::OnPerceptionUpdated);
 	}
-	
 }
 
 void AAITurretController::SetupData(const FAIDataForSightConfig* AISightConfigData)
@@ -41,19 +42,49 @@ void AAITurretController::SetupData(const FAIDataForSightConfig* AISightConfigDa
 
 void AAITurretController::UpdateTurretRotation(float DeltaSeconds)
 {
+	ATurret* Turret = Cast<ATurret>(GetPawn());
+	
 	if (CurrentTargetActor)
 	{
 		FVector TargetLocation = CurrentTargetActor->GetActorLocation();
 		FVector MyLocation = GetPawn()->GetActorLocation();
-		FVector Direction = TargetLocation - MyLocation;
+		FVector Direction = (TargetLocation - MyLocation).GetSafeNormal();
 		Direction.Z = 0;
 
-		FRotator CurrentRotation = GetPawn()->GetActorRotation();
 		FRotator TargetRotation = Direction.Rotation();
-
-		FRotator NewRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, DeltaSeconds, 8.f);
-
-		GetPawn()->SetActorRotation(NewRotation);
+		FRotator TurretRotation = GetPawn()->GetActorRotation();
+		
+		float AngleDifference = FMath::Abs(TargetRotation.Yaw - TurretRotation.Yaw);
+		AngleDifference = FMath::Min(AngleDifference, 360.f - AngleDifference);
+		
+		if (Turret && AngleDifference <= 5.0f)
+		{
+			if(ToPlayAudio)
+			{
+				Turret->PlayAudio();
+				ToPlayAudio = false;
+			}
+			Turret->ProjectileComponent->Shoot();
+			if(Turret->ProjectileComponent->ActualAmmo <= 0)  Turret->ProjectileComponent->Recharge();
+		}
+		else
+		{
+			FRotator NewRotation = FMath::RInterpTo(TurretRotation, TargetRotation, DeltaSeconds, 8.f);
+			GetPawn()->SetActorRotation(NewRotation);
+			if(!ToPlayAudio)
+			{
+				Turret->StopAudio();
+				ToPlayAudio = true;
+			}
+		}
+	}
+	else
+	{
+		if(!ToPlayAudio)
+		{
+			Turret->StopAudio();
+			ToPlayAudio = true;
+		}
 	}
 }
 
@@ -61,10 +92,7 @@ void AAITurretController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (PerceptionComponent)
-	{
-		PerceptionComponent->RequestStimuliListenerUpdate();
-	}
+	if (PerceptionComponent) PerceptionComponent->RequestStimuliListenerUpdate();
 }
 
 void AAITurretController::Tick(float DeltaSeconds)
@@ -73,7 +101,6 @@ void AAITurretController::Tick(float DeltaSeconds)
 	UpdateTurretRotation(DeltaSeconds);
 }
 
-//TODO: Set Enemy Tag
 void AAITurretController::OnPerceptionUpdated(const TArray<AActor*>& UpdatedActors)
 {
 	AActor* ClosestActor = nullptr;
@@ -83,10 +110,8 @@ void AAITurretController::OnPerceptionUpdated(const TArray<AActor*>& UpdatedActo
 
 	for (AActor* Actor : UpdatedActors)
 	{
-		if (Actor->ActorHasTag("Player"))
+		if (Actor->ActorHasTag("Enemy"))
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Player detected"));
-		
 			float DistanceSquared = FVector::DistSquared(MyLocation, Actor->GetActorLocation());
 			if (DistanceSquared < MinDistanceSquared)
 			{
@@ -95,10 +120,6 @@ void AAITurretController::OnPerceptionUpdated(const TArray<AActor*>& UpdatedActo
 			}
 		}
 	}
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Perception updated"));
-	if (ClosestActor)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, ClosestActor->GetName());
-	}
+
 	CurrentTargetActor = ClosestActor;
 }

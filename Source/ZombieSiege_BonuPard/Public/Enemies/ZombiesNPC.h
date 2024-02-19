@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Interfaces/SpawnInterface.h"
-#include "ZombiesAIController.h"
+#include "Enemies/ZombiesAIController.h"
 #include "Components/HealthComponent.h"
 #include "GameFramework/Character.h"
 #include "Sound/SoundCue.h"
@@ -24,6 +24,8 @@ public:
 	bool IsDied = false;
 	UPROPERTY(VisibleAnywhere)
 	bool CanSpawn = false;
+	UPROPERTY(EditAnywhere, Category = "Setup")
+	FName Tag = "Enemy";
 	
 	//Zombies Abilities
 	UPROPERTY(EditAnywhere, Category = "Setup")

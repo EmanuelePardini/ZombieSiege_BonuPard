@@ -20,7 +20,7 @@ struct FItemLevelData
 	float Health;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Level Data")
-	float Price;
+	int Price;
 };
 
 UENUM(BlueprintType)

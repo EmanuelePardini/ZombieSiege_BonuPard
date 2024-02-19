@@ -3,6 +3,7 @@
 
 #include "Buildables/Turret.h"
 #include "Buildables/AITurretController.h"
+#include "Components/AudioComponent.h"
 #include "Components/MoneySystemComponent.h"
 #include "Components/BoxComponent.h"
 
@@ -34,6 +35,12 @@ ATurret::ATurret()
     InvalidMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("InvalidMesh"));
     InvalidMesh->SetupAttachment(RootComponent);
     InvalidMesh->SetVisibility(false);
+
+	ProjectileComponent = CreateDefaultSubobject<UProjectileComponent>("ProjectileComponent");
+	
+	//Audio Settings
+	AudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComponent"));
+	AudioComponent->bAutoActivate = false;
 }
 
 // Called when the game starts or when spawned
@@ -72,7 +79,7 @@ FText ATurret::Interact(AActor* Interactor)
 	}
 	
 	int NextLevelData = ItemData.Levels[static_cast<ETurretLevel>(static_cast<int>(TurretLevel) + 1)].Price;
-	bool CanAffordUpgrade = Interactor->GetComponentByClass<UMoneySystemComponent>()->CanAfford(NextLevelData).Get<0>();
+	bool CanAffordUpgrade = Interactor->GetComponentByClass<UMoneySystemComponent>()->CanAfford(NextLevelData);
 	if (CanAffordUpgrade)
 	{
 		Interactor->GetComponentByClass<UMoneySystemComponent>()->SpendMoney(NextLevelData);
@@ -117,6 +124,18 @@ void ATurret::SetupLevel(ETurretLevel Level)
 	LevelData = ItemData.Levels[Level];
 }
 
+void ATurret::PlayAudio()
+{
+	AudioComponent->SetSound(ShootingSound);
+	AudioComponent->Play();
+}
+
+void ATurret::StopAudio()
+{
+	AudioComponent->SetSound(ShootingSound);
+	AudioComponent->Stop();
+}
+
 const FAIDataForSightConfig* ATurret::GetAIData()
 {
 	if (DataTableReference.IsValid())
@@ -124,13 +143,11 @@ const FAIDataForSightConfig* ATurret::GetAIData()
 		FItemData* Data = DataTableReference->FindRow<FItemData>(RowName, FString());
 		if (Data)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Data found"));
+
 			AIData.AISightRadius = Data->AISightRadius;
 			AIData.AILoseSightRadius = Data->AILoseSightRadius;
 			AIData.AISightAge = Data->AISightAge;
 			AIData.AIFieldOfView = Data->AIFieldOfView;
-		} else {
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("No data found"));
 		}
 	}
 	return &AIData;

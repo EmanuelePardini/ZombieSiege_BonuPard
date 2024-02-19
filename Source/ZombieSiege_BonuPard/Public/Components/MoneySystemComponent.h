@@ -21,7 +21,7 @@ public:
 
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMoneyChanged, int, NewMoneyAmount);
 	FOnMoneyChanged OnMoneyChanged;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(VisibleAnywhere)
 	AZombiesRounds* RoundsTrigger;
 	UPROPERTY(EditAnywhere, Category = "Setup")
 	int KillReward = 50;
@@ -29,8 +29,7 @@ public:
 	int RoundReward = 1000;
 
 	void SetupInitialMoney();
-
-	void SetupUI();
+	
     void InitTriggerReference();
 	UFUNCTION()
 	void AddMoney(int Amount);
@@ -38,7 +37,7 @@ public:
 	void RemoveMoney(int Amount);
 	UFUNCTION()
 	void  SpendMoney(int Amount);
-	TTuple<bool, int> CanAfford(int Amount) const;
+	bool CanAfford(int Amount);
 
 protected:
 	// Called when the game starts

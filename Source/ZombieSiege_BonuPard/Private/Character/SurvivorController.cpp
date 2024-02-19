@@ -14,22 +14,19 @@ void ASurvivorController::BeginPlay()
 
 void ASurvivorController::SetUpHUD(FVector2D Position, FVector2D Size)
 {
-	if (HUDClass != nullptr) {
+	if (HUDClass) {
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.Owner = this;
 		ACustomHUD* NewHUD = GetWorld()->SpawnActor<ACustomHUD>(HUDClass, SpawnParams);
-
-		if (NewHUD != nullptr) {
-			PlayerHUD = NewHUD;
-		}
+		if (NewHUD) PlayerHUD = NewHUD;
 	}
 	
 	if (IsLocalPlayerController() && PlayerHUD)
 	{
-			PlayerHUD->MainUserWidget->SetPositionInViewport(Position);
-			PlayerHUD->MainUserWidget->SetDesiredSizeInViewport(Size);
-			
-			PlayerHUD->MainUserWidget->AddToViewport();
+		PlayerHUD->InitTriggerReference();
+		PlayerHUD->MainUserWidget->SetPositionInViewport(Position);
+		PlayerHUD->MainUserWidget->SetDesiredSizeInViewport(Size);
+		PlayerHUD->MainUserWidget->AddToViewport();
 	}
 }
 
@@ -144,19 +141,19 @@ void ASurvivorController::EndRun(const FInputActionValue& Value)
 	}
 }
 
-void ASurvivorController::Crouch(const FInputActionValue& Value)
+void ASurvivorController::Crouch()
 {
 	if(SurvivorCharacter)
 	{
-		SurvivorCharacter->Crouch(Value);
+		SurvivorCharacter->DoCrouch();
 	}
 }
 
-void ASurvivorController::UnCrouch(const FInputActionValue& Value)
+void ASurvivorController::UnCrouch()
 {
 	if(SurvivorCharacter)
 	{
-		SurvivorCharacter->UnCrouch(Value);
+		SurvivorCharacter->DoUnCrouch();
 	}
 }
 

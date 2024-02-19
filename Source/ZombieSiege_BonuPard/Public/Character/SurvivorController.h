@@ -67,8 +67,8 @@ public:
 	void EndRun(const FInputActionValue& Value);
 
 	//Crouch Manage
-	void Crouch(const FInputActionValue& Value);
-	void UnCrouch(const FInputActionValue& Value);
+	void Crouch();
+	void UnCrouch();
 
 	//Combat manage
 	void Aim(const FInputActionValue& Value);

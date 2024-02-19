@@ -24,7 +24,8 @@ AZombiesRounds::AZombiesRounds()
 void AZombiesRounds::BeginPlay()
 {
 	Super::BeginPlay();
-	Init();
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AZombiesRounds::Init, 5.0f, false);
 }
 
 // Called every frame
@@ -32,6 +33,11 @@ void AZombiesRounds::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	ManageRound(DeltaTime);
+}
+
+void AZombiesRounds::SetupInitialRound()
+{
+	OnRoundChange.Broadcast(ActualRound);
 }
 
 void AZombiesRounds::Init()
@@ -109,6 +115,7 @@ void AZombiesRounds::TerminateRound()
 	{
 		OnRoundEnd.Broadcast(RoundReward);
 		ActualRound++;
+		OnRoundChange.Broadcast(ActualRound);
 	}
 	else
 	{
@@ -132,7 +139,7 @@ void AZombiesRounds::TerminateRound()
 
 void AZombiesRounds::EndGame()
 {
-	//TODO: Implement Main, Pause, GameOver, EndGame Menu
+	UGameplayStatics::OpenLevel(this, "VictoryMap");
 }
 
 

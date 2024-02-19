@@ -3,9 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Camera/CameraComponent.h"
 #include "Components/ActorComponent.h"
-#include "Components/SphereComponent.h"
 #include "ProjectileComponent.generated.h"
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -16,6 +14,7 @@ class ZOMBIESIEGE_BONUPARD_API UProjectileComponent : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UProjectileComponent();
+	void SetupInitialAmmo();
 	//Weapon Variables
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Setup")
 	float ProjectileDistance = 10000;
@@ -35,6 +34,9 @@ public:
 	int LoaderAmmo = 50;
 	UPROPERTY()
 	int ActualAmmo = LoaderAmmo;
+
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAmmoChanged, int, NewAmmoAmount);
+	FOnAmmoChanged OnAmmoChanged;
 	
 	// UPROPERTY(EditAnywhere, Category = "Setup")
 	// int TotalAmmo = LoaderAmmo * 10;
@@ -56,5 +58,6 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	void ManageShootTimer(float DeltaTime);
 	void Shoot();
+	void Recharge();
 	void AttachProjectileLine();
 };

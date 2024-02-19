@@ -17,17 +17,6 @@ UMoneySystemComponent::UMoneySystemComponent()
 void UMoneySystemComponent::SetupInitialMoney()
 {
 	Money = InitialMoney;
-}
-
-void UMoneySystemComponent::SetupUI()
-{
-	UWorld* Context = GetWorld();
-	ASurvivorCharacter* Player = Cast<ASurvivorCharacter>(GetOwner());
-	ASurvivorController* Controller = Cast<ASurvivorController>(Player->GetController());
-	if (!Context || !Player || !Controller) return;
-	ACustomHUD* HUD = Controller->PlayerHUD;
-	if (!HUD) return;
-	OnMoneyChanged.AddDynamic(HUD, &ACustomHUD::SetTopRightText);
 	OnMoneyChanged.Broadcast(Money);
 }
 
@@ -59,19 +48,18 @@ void UMoneySystemComponent::SpendMoney(const int Amount)
 	OnMoneyChanged.Broadcast(Money);
 }
 
-TTuple<bool, int> UMoneySystemComponent::CanAfford(const int Amount) const
+bool UMoneySystemComponent::CanAfford(const int Amount)
 {
-	return TTuple<bool, int>(Money >= Amount, Money - Amount);
+	if (Money >= Amount) return true;
+	return false;
 }
 
 // Called when the game starts
 void UMoneySystemComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	SetupInitialMoney();
 	InitTriggerReference();
-	FTimerHandle TimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UMoneySystemComponent::SetupUI, 5.0f, false);
+
 }
 
 

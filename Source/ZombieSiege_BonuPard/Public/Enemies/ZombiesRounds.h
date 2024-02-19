@@ -10,7 +10,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnZombieKilled, int, Amount);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRoundEnd, int, Amount);
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRoundChange, int, ActualRound);
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ZOMBIESIEGE_BONUPARD_API AZombiesRounds : public AActor
 {
@@ -59,11 +59,13 @@ public:
 	FOnZombieKilled OnZombieKilled;
 	UPROPERTY(BlueprintAssignable)
 	FOnRoundEnd OnRoundEnd;
+	UPROPERTY(BlueprintAssignable)
+	FOnRoundChange OnRoundChange;
 	UPROPERTY(EditAnywhere, Category = "Setup")
 	int KillReward = 50;
 	UPROPERTY(EditAnywhere, Category = "Setup")
 	int RoundReward = 1000;
-	
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -71,6 +73,7 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	void SetupInitialRound();
 	void Init();
 	void ManageRound(float DeltaTime);
 	void IncrementZombieDied();

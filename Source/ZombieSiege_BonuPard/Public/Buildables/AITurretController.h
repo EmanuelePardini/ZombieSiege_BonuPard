@@ -6,6 +6,7 @@
 #include "AIController.h"
 #include "Turret.h"
 #include "Perception/AISenseConfig_Sight.h"
+#include "Sound/SoundCue.h"
 #include "AITurretController.generated.h"
 
 /**
@@ -17,6 +18,12 @@ class ZOMBIESIEGE_BONUPARD_API AAITurretController : public AAIController
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Perception", meta = (AllowPrivateAccess = "true"))
+	AActor* CurrentTargetActor;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Perception", meta = (AllowPrivateAccess = "true"))
+	bool ToPlayAudio = true;
+	
 	AAITurretController();
 
 	void SetupData(const FAIDataForSightConfig* AISightConfigData);
@@ -34,8 +41,9 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Perception", meta = (AllowPrivateAccess = "true"))
 	UAISenseConfig_Sight* SightConfig;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Perception", meta = (AllowPrivateAccess = "true"))
-	AActor* CurrentTargetActor;
+
+	
+
 
 	UFUNCTION()
 	void OnPerceptionUpdated(const TArray<AActor*>& UpdatedActors);

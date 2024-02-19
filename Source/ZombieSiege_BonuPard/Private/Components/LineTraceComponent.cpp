@@ -68,7 +68,7 @@ void ULineTraceComponent::Interact() const
 				FText InteractionLabel = Interactable->Interact(Owner);
 				ASurvivorController* Controller = Cast<ASurvivorController>(Owner->GetController());
 				if (!Controller) return;
-				ACustomHUD* HUD = Cast<ACustomHUD>(Controller->GetHUD());
+				ACustomHUD* HUD = Cast<ACustomHUD>(Controller->PlayerHUD);
 				if (HUD)
 				{
 					HUD->SetLabelText(InteractionLabel);
@@ -86,7 +86,7 @@ void ULineTraceComponent::IsInteractable() const
 
 	auto [Hits, _Start, _End, _Params] = DoLineTrace(false);
 	ASurvivorController* Controller = Cast<ASurvivorController>(Owner->GetController());
-	ACustomHUD* HUD = Cast<ACustomHUD>(Controller->GetHUD());
+	ACustomHUD* HUD = Cast<ACustomHUD>(Controller->PlayerHUD);
 	TArray<FEnhancedActionKeyMapping> Mappings = Cast<ASurvivorController>(Owner->GetController())->IMC->GetMappings();
 	FString ActionKey;
 

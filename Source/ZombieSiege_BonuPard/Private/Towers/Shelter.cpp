@@ -3,6 +3,8 @@
 
 #include "Towers/Shelter.h"
 
+#include "Kismet/GameplayStatics.h"
+
 // Sets default values
 AShelter::AShelter()
 {
@@ -11,6 +13,8 @@ AShelter::AShelter()
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>("HealthComponent");
 	HealthComponent->MaxHealth = 500.f;
 	HealthComponent->Health = 500.f;
+
+	HealthText = CreateDefaultSubobject<UTextRenderComponent>(TEXT("HealthText"));
 }
 
 // Called when the game starts or when spawned
@@ -23,7 +27,7 @@ void AShelter::BeginPlay()
 void AShelter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	if (HealthComponent) HealthText->SetText(FText::FromString(FString::FromInt(HealthComponent->Health)));
 }
 
 void AShelter::Spawn(FVector Location)
@@ -34,6 +38,6 @@ void AShelter::Spawn(FVector Location)
 void AShelter::Die()
 {
 	ISpawnInterface::Die();
-	//Game Over
+	UGameplayStatics::OpenLevel(this, "GameOverMap");
 }
 

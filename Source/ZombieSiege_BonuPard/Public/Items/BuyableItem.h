@@ -60,5 +60,5 @@ public:
 	 */
 	void LoadRow(FPropertyChangedEvent& PropertyChangedEvent);
 
-	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+	// virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 };

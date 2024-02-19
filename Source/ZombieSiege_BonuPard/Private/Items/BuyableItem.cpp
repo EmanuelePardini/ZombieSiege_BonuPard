@@ -10,7 +10,8 @@ ABuyableItem::ABuyableItem()
 {
     PrimaryActorTick.bCanEverTick = true;
     Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ItemMesh"));
-    RootComponent = Mesh;
+    SetRootComponent(Mesh);
+    Mesh->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
 }
 
 // Called when the game starts or when spawned
@@ -21,11 +22,8 @@ void ABuyableItem::BeginPlay()
     if (DataTableReference)
     {
         FItemData* LoadedItemData = DataTableReference->FindRow<FItemData>(RowName, FString());
-        if (LoadedItemData)
-        {
-            GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Item %s loaded"), *RowName.ToString()));
-            GetComponentByClass<UInventoryComponent>()->AddItem(LoadedItemData->ItemID, Quantity);
-        }
+        if (LoadedItemData) GetComponentByClass<UInventoryComponent>()->AddItem(LoadedItemData->ItemID, Quantity);
+        ItemData = *LoadedItemData;
     }
 }
 
@@ -38,14 +36,12 @@ void ABuyableItem::Tick(float DeltaTime)
 FText ABuyableItem::Interact(AActor* Interactor)
 {
     UMoneySystemComponent* MoneySystem = Interactor->GetComponentByClass<UMoneySystemComponent>();
-
     if (!MoneySystem)
     {
         UE_LOG(LogTemp, Warning, TEXT("No MoneySystemComponent found on %s"), *Interactor->GetName());
         return FText::FromString("No MoneySystemComponent found");
     }
-
-    if (MoneySystem->CanAfford(ItemData.Price).Get<0>())
+    if (MoneySystem->CanAfford(ItemData.Price))
     {
         MoneySystem->SpendMoney(ItemData.Price);
         GetComponentByClass<UInventoryComponent>()->GiveItemsTo(Interactor->GetComponentByClass<UInventoryComponent>(), RowName, 1);
@@ -83,8 +79,8 @@ void ABuyableItem::LoadRow(FPropertyChangedEvent& PropertyChangedEvent)
     }
 }
 
-void ABuyableItem::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
-{
-    Super::PostEditChangeProperty(PropertyChangedEvent);
-    LoadRow(PropertyChangedEvent);
-}
+// void ABuyableItem::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+// {
+//     Super::PostEditChangeProperty(PropertyChangedEvent);
+//     LoadRow(PropertyChangedEvent);
+// }

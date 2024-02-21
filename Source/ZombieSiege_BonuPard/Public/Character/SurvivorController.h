@@ -3,9 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CustomHUD.h"
 #include "SurvivorCharacter.h"
 #include "GameFramework/PlayerController.h"
-#include "GameFramework/PlayerStart.h"
+#include "Blueprint/UserWidget.h"
 #include "SurvivorController.generated.h"
 
 /**
@@ -16,14 +17,20 @@ class ZOMBIESIEGE_BONUPARD_API ASurvivorController : public APlayerController
 {
 	GENERATED_BODY()
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Setup")
+	class UInputMappingContext* IMC;
 
+	//For HUD
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="HUD")
+	ACustomHUD* PlayerHUD;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="HUD")
+	TSubclassOf<AHUD> HUDClass;
 
 protected:
 	//For Inputs
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Setup")
 	class USurvivorInputData* InputData;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Setup")
-	class UInputMappingContext* IMC;
+
 
 	//For Survivor Control
 	UPROPERTY(VisibleAnywhere)
@@ -40,6 +47,7 @@ protected:
 	virtual void BeginPlay() override;
 	
 public:
+	void SetUpHUD(FVector2D Position, FVector2D Size);
 	void AssignPlayersIMC();
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void SetupInputComponent() override;
@@ -59,8 +67,20 @@ public:
 	void EndRun(const FInputActionValue& Value);
 
 	//Crouch Manage
-	void Crouch(const FInputActionValue& Value);
-	void UnCrouch(const FInputActionValue& Value);
+	void Crouch();
+	void UnCrouch();
+
+	//Combat manage
+	void Aim(const FInputActionValue& Value);
+	void StopAim(const FInputActionValue& Value);
+	void Shoot(const FInputActionValue& Value);
+	void StopShoot(const FInputActionValue& Value);
+	void Reload(const FInputActionValue& Value);
+
+	//Build Manage
+	void ToggleBuild(const FInputActionValue& Value);
+	void Build(const FInputActionValue& Value);
+	void SwapBuildable(const FInputActionValue& InputActionValue);
 
 	//Interaction Manage
 	void Interact(const FInputActionValue& Value);

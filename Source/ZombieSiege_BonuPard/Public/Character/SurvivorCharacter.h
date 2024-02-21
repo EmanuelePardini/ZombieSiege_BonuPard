@@ -3,13 +3,21 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/BuildSystem.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
+#include "Components/InventoryComponent.h"
+#include "Components/LineTraceComponent.h"
+#include "Interfaces/SpawnInterface.h"
 #include "Animations/SurvivorAnim.h"
+#include "Components/HealthComponent.h"
+#include "Components/MoneySystemComponent.h"
+#include "Components/ProjectileComponent.h"
+#include "Sound/SoundCue.h"
 #include "SurvivorCharacter.generated.h"
 
 UCLASS()
-class ZOMBIESIEGE_BONUPARD_API ASurvivorCharacter : public ACharacter
+class ZOMBIESIEGE_BONUPARD_API ASurvivorCharacter : public ACharacter, public ISpawnInterface
 {
 	GENERATED_BODY()
 
@@ -18,10 +26,23 @@ public:
 	ASurvivorCharacter();
 
 	//Components Declaration
-
+	UPROPERTY(EditAnywhere, Category = "Setup")
+	UHealthComponent* HealthComponent;
+	UPROPERTY(EditAnywhere, Category = "Setup")
+	UProjectileComponent* ProjectileComponent;
+	UPROPERTY(EditAnywhere, Category = "Setup")
+	ULineTraceComponent* LineTraceComponent;
+	UPROPERTY(EditAnywhere, Category = "Setup")
+	UInventoryComponent* InventoryComponent;
+	UPROPERTY(EditAnywhere, Category="Setup")
+	UBuildSystem* BuildSystemComponent;
+	UPROPERTY(EditAnywhere, Category = "Setup")
+	UMoneySystemComponent* MoneySystemComponent;
+	
 	//Animations Declaration
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Animations")
+	UPROPERTY()
 	USurvivorAnim* Animations;
+	
 	//Movement Parameters
 	UPROPERTY(VisibleAnywhere)
 	bool IsCrouched = false;
@@ -29,6 +50,24 @@ public:
 	bool IsAiming = false;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	bool IsRunning = false;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	bool IsShooting = false;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	bool IsReloading = false;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	bool IsDied = false;
+	
+	//Timers
+	UPROPERTY(EditAnywhere, Category = "Setup")
+	float ReloadDelay = 2.f;
+	UPROPERTY(EditAnywhere, Category = "Setup")
+	float ReloadTimer = 0.f;
+
+	//Audio Management
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+	UAudioComponent* AudioComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+	USoundCue* ShootingSound;
 	
 protected:
 	
@@ -48,8 +87,21 @@ public:
 	void EndRun(const FInputActionValue& Value);
 
 	//Crouch Manage
-	void Crouch(const FInputActionValue& Value);
-	void UnCrouch(const FInputActionValue& Value);
+	void DoCrouch();
+	void DoUnCrouch();
+
+	//Combat manage
+	void Aim(const FInputActionValue& Value);
+	void StopAim(const FInputActionValue& Value);
+	void Shoot(const FInputActionValue& Value);
+	void StopShoot(const FInputActionValue& Value);
+	void Reload(const FInputActionValue& Value);
+	void ManageReload(float DeltaTime); //Once the action started doesn't need the player to keep the button
+
+	//Build Manage
+	void ToggleBuild(const FInputActionValue& Value);
+	void Build(const FInputActionValue& Value);
+	void SwapBuildable(const FInputActionValue& InputActionValue);
 	
 	//Interaction Manage
 	void Interact(const FInputActionValue& Value);
@@ -60,4 +112,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void Spawn(FVector Location) override;
+	virtual void Die() override;
+	bool IsAnyOneAlive();
 };

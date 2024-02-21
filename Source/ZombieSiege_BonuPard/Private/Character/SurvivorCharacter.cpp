@@ -3,7 +3,12 @@
 
 #include "ZombieSiege_BonuPard/Public/Character/SurvivorCharacter.h"
 
+#include "ZombieSiege_GameMode.h"
+#include "Components/BuildSystem.h"
+#include "Components/AudioComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Interfaces/SpawnInterface.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ASurvivorCharacter::ASurvivorCharacter()
@@ -14,6 +19,20 @@ ASurvivorCharacter::ASurvivorCharacter()
 	//Movement Settings
 	GetCharacterMovement()->JumpZVelocity = 500.f;
 	GetCharacterMovement()->MaxWalkSpeed = 400.f;
+
+	//Audio Settings
+	AudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComponent"));
+	AudioComponent->bAutoActivate = false;
+
+	//Components Settings
+	ProjectileComponent = CreateDefaultSubobject<UProjectileComponent>("ProjectileComponent");
+	LineTraceComponent = CreateDefaultSubobject<ULineTraceComponent>("LineTraceComponent");
+	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>("InventoryComponent");
+	BuildSystemComponent = CreateDefaultSubobject<UBuildSystem>("BuildSystemComponent");
+	MoneySystemComponent = CreateDefaultSubobject<UMoneySystemComponent>("MoneySystemComponent");
+	HealthComponent = CreateDefaultSubobject<UHealthComponent>("HealthComponent");
+	HealthComponent->MaxHealth = 50;
+	HealthComponent->Health = 50;
 }
 
 // Called when the game starts or when spawned
@@ -27,32 +46,38 @@ void ASurvivorCharacter::BeginPlay()
 
 void ASurvivorCharacter::Move(const FInputActionValue& Value)
 {
-	// Obtains the controller's rotation and create a rotation on the yaw axis
-	FVector2d MovementValue = Value.Get<FVector2d>();
-	const FRotator Rotation = Controller->GetControlRotation();
-	const FRotator YawRotation(0, Rotation.Yaw, 0);
+	if(!IsShooting && !IsReloading && !IsDied)
+	{
+		// Obtains the controller's rotation and create a rotation on the yaw axis
+		FVector2d MovementValue = Value.Get<FVector2d>();
+		const FRotator Rotation = Controller->GetControlRotation();
+		const FRotator YawRotation(0, Rotation.Yaw, 0);
 
-	// Gets the forward and right directions based on the Yaw rotation
-	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+		// Gets the forward and right directions based on the Yaw rotation
+		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
-	// Adds movement input along the forward axis (ForwardDirection) and the right axis (RightDirection)
-	AddMovementInput(ForwardDirection, MovementValue.Y);
-	AddMovementInput(RightDirection, MovementValue.X);
+		// Adds movement input along the forward axis (ForwardDirection) and the right axis (RightDirection)
+		AddMovementInput(ForwardDirection, MovementValue.Y);
+		AddMovementInput(RightDirection, MovementValue.X);
+	}
 }
 
 void ASurvivorCharacter::Look(const FInputActionValue& Value)
 {
-	FVector2d LookValue = Value.Get<FVector2d>();
+	if(!IsDied)
+	{
+		FVector2d LookValue = Value.Get<FVector2d>();
 	
-	// Adds input to control the rotation
-	AddControllerYawInput(LookValue.X);
-	AddControllerPitchInput(LookValue.Y);
+		// Adds input to control the rotation
+		AddControllerYawInput(LookValue.X);
+		AddControllerPitchInput(LookValue.Y);
+	}
 }
 
 void ASurvivorCharacter::DoJump(const FInputActionValue& Value)
 {
-	if(!IsCrouched)
+	if(!IsCrouched && !IsAiming && !IsDied)
 	{
 		Jump();
 	}
@@ -60,7 +85,7 @@ void ASurvivorCharacter::DoJump(const FInputActionValue& Value)
 
 void ASurvivorCharacter::Run(const FInputActionValue& Value)
 {
-	if(!IsCrouched && !IsAiming)
+	if(!IsCrouched && !IsAiming && !IsDied)
 	{
 		GetCharacterMovement()->MaxWalkSpeed = 600.f;
 		Animations->IsRunning = true;
@@ -75,37 +100,197 @@ void ASurvivorCharacter::EndRun(const FInputActionValue& Value)
 	IsRunning = false;
 }
 
-void ASurvivorCharacter::Crouch(const FInputActionValue& Value)
+void ASurvivorCharacter::DoCrouch()
 {
-	if(!IsRunning)
+	if(!IsRunning && !IsAiming && !IsDied)
 	{
+		GetCharacterMovement()->MaxWalkSpeed = 250.f;
 		IsCrouched = true;
 		Animations->IsCrouched = true;
 	}
 }
 
-void ASurvivorCharacter::UnCrouch(const FInputActionValue& Value)
+void ASurvivorCharacter::DoUnCrouch()
 {
-	IsCrouched = false;
-	Animations->IsCrouched = false;
+	if(!IsAiming && !IsDied)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = 400.f;
+		IsCrouched = false;
+		Animations->IsCrouched = false;
+	}
+}
+
+void ASurvivorCharacter::Aim(const FInputActionValue& Value)
+{
+	if(!IsRunning && !IsReloading && !IsDied)
+	{
+		IsAiming = true;
+		Animations->IsAiming = true;
+	}
+}
+
+void ASurvivorCharacter::StopAim(const FInputActionValue& Value)
+{
+	//First stop shooting
+	AudioComponent->Stop();
+	IsShooting = false;
+	Animations->IsShooting = false;
+	
+	IsAiming = false;
+	Animations->IsAiming = false;
+}
+
+void ASurvivorCharacter::Shoot(const FInputActionValue& Value)
+{
+	if(IsAiming && ProjectileComponent->ActualAmmo > 0 && !IsDied)
+	{ //If is aiming and has ammo then can shoot
+		if(!IsShooting) //If is starting to shoot now play the sound only one time
+		{
+			AudioComponent->SetSound(ShootingSound);
+			AudioComponent->Play();
+		}
+		IsShooting = true;
+		Animations->IsShooting = true;
+		ProjectileComponent->Shoot();
+
+	}
+	else
+	{ //If has no ammo need to recharge
+		Reload(true);
+	}
+}
+
+void ASurvivorCharacter::StopShoot(const FInputActionValue& Value)
+{
+		AudioComponent->Stop();
+		IsShooting = false;
+		Animations->IsShooting = false;
+}
+
+void ASurvivorCharacter::Reload(const FInputActionValue& Value)
+{
+	if(ProjectileComponent->ActualAmmo < ProjectileComponent->LoaderAmmo && !IsDied)
+	{
+		StopShoot(true);
+		StopAim(true);
+		IsReloading = true;
+		Animations->IsReloading = true;
+	}
+}
+
+void ASurvivorCharacter::ManageReload(float DeltaTime)
+{
+	ReloadTimer += DeltaTime;
+	if(ReloadTimer >= ReloadDelay)
+	{
+		ProjectileComponent->Recharge();
+		Animations->IsReloading = false;
+		IsReloading = false;
+		ReloadTimer = 0;
+	}
+}
+
+void ASurvivorCharacter::ToggleBuild(const FInputActionValue& Value)
+{
+	if(!IsDied)
+	{
+		if (auto* BuildSystem = GetComponentByClass<UBuildSystem>()) BuildSystem->ToggleBuildMode();
+	}
+	
+}
+
+void ASurvivorCharacter::Build(const FInputActionValue& Value)
+{
+	if(!IsDied)
+	{
+		if (auto* BuildSystem = GetComponentByClass<UBuildSystem>()) BuildSystem->Build();
+	}
+	
+}
+
+void ASurvivorCharacter::SwapBuildable(const FInputActionValue& InputActionValue)
+{
+	if(!IsDied)
+	{
+		if (auto* BuildSystem = GetComponentByClass<UBuildSystem>())  BuildSystem->SwapBuildable(InputActionValue.Get<float>());
+	}
+	
 }
 
 void ASurvivorCharacter::Interact(const FInputActionValue& Value)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Red, FString(TEXT("To implement Interact")));
+	if(!IsDied)
+	{
+		GetComponentByClass<ULineTraceComponent>()->Interact();
+	}
+	
 }
 
 void ASurvivorCharacter::Drop(const FInputActionValue& Value)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Red, FString(TEXT("To implement Drop")));
 }
 
 // Called every frame
 void ASurvivorCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	//For animations
 	if(Animations)
 	{
 		Animations->Animate(this);
 	}
+	//For automatic Actions
+	if(IsReloading)
+	{
+		ManageReload(DeltaTime);
+	}
+	
+}
+
+void ASurvivorCharacter::Spawn(FVector Location)
+{
+	ISpawnInterface::Spawn(Location);
+	IsDied = false;
+	SetActorHiddenInGame(false);
+	SetActorEnableCollision(true);
+	HealthComponent->SetupInitialHealth();
+}
+
+void ASurvivorCharacter::Die()
+{
+	ISpawnInterface::Die();
+	
+	UWorld* World = GetWorld();
+	
+	if (World)
+	{
+		AZombieSiege_GameMode* GameMode = Cast<AZombieSiege_GameMode>(World->GetAuthGameMode());
+		if(GameMode && GameMode->IsCoop)
+		{
+			IsDied = true;
+			SetActorHiddenInGame(true);
+			SetActorEnableCollision(false);
+		}
+		if(!IsAnyOneAlive()) UGameplayStatics::OpenLevel(this, "GameOverMap");
+	}
+}
+
+bool ASurvivorCharacter::IsAnyOneAlive()
+{
+	UWorld* World = GetWorld();
+	TArray<AActor*> FoundSurvivorCharacters;
+	bool IsAnyoneAlive = false;
+	
+	UGameplayStatics::GetAllActorsOfClass(World, ASurvivorCharacter::StaticClass(), FoundSurvivorCharacters);
+				
+	for (AActor* Actor : FoundSurvivorCharacters)
+	{
+		ASurvivorCharacter* SurvivorCharacter = Cast<ASurvivorCharacter>(Actor);
+		if (!SurvivorCharacter->IsDied)
+		{
+			IsAnyoneAlive = true;
+		}
+	}
+
+	return IsAnyoneAlive;
 }

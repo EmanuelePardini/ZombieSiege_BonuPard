@@ -30,4 +30,16 @@ public:
 	UInputAction* Interact;
 	UPROPERTY(EditDefaultsOnly, Category="Setup")
 	UInputAction* Drop;
+	UPROPERTY(EditDefaultsOnly, Category="Setup")
+	UInputAction* Aim;
+	UPROPERTY(EditDefaultsOnly, Category="Setup")
+	UInputAction* Shoot;
+	UPROPERTY(EditDefaultsOnly, Category="Setup")
+	UInputAction* Reload;
+	UPROPERTY(EditDefaultsOnly, Category="Setup")
+	UInputAction* ToggleBuild;
+	UPROPERTY(EditDefaultsOnly, Category="Setup")
+	UInputAction* Build;
+	UPROPERTY(EditDefaultsOnly, Category="Setup")
+	UInputAction* SwapBuildable;
 };

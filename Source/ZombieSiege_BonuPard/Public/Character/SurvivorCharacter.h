@@ -62,6 +62,11 @@ public:
 	float ReloadDelay = 2.f;
 	UPROPERTY(EditAnywhere, Category = "Setup")
 	float ReloadTimer = 0.f;
+	UPROPERTY(VisibleAnywhere)
+	FTimerHandle IsRevivingTimer;
+	UPROPERTY(VisibleAnywhere)
+	int ReviveProgression = 0;
+	
 
 	//Audio Management
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
@@ -102,10 +107,12 @@ public:
 	void ToggleBuild(const FInputActionValue& Value);
 	void Build(const FInputActionValue& Value);
 	void SwapBuildable(const FInputActionValue& InputActionValue);
-	
+	void Revive(const FInputActionValue& Value);
+
 	//Interaction Manage
-	void Interact(const FInputActionValue& Value);
-	
+	void Interactor(const FInputActionValue& Value);
+	FText Interact(AActor* Interactor);
+	void DecreaseRevive();
 	//Drop Items Manage
 	void Drop(const FInputActionValue& Value);
 	

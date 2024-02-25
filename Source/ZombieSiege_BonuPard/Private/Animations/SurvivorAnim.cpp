@@ -20,4 +20,13 @@ void USurvivorAnim::Animate(ACharacter* Character)
 	SpeedY = Velocity.Y;
 	Velocity = Velocity.GetSafeNormal();
 	Direction = FMath::RadiansToDegrees(FMath::Atan2(SpeedY, SpeedX));
+
+	if(IsDead)
+	{
+		IsCrouched = false;
+		IsRunning = false;
+		IsAiming = false;
+		IsShooting = false;
+		IsReloading = false;
+	}
 }

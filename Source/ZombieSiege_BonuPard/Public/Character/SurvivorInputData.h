@@ -42,4 +42,6 @@ public:
 	UInputAction* Build;
 	UPROPERTY(EditDefaultsOnly, Category="Setup")
 	UInputAction* SwapBuildable;
+	UPROPERTY(EditDefaultsOnly, Category="Setup")
+	UInputAction* Revive;
 };

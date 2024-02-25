@@ -10,8 +10,7 @@ ABuyableItem::ABuyableItem()
 {
     PrimaryActorTick.bCanEverTick = true;
     Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ItemMesh"));
-    SetRootComponent(Mesh);
-    Mesh->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
+    Mesh->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned

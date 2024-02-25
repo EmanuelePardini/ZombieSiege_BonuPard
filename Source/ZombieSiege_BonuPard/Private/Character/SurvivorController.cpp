@@ -87,6 +87,8 @@ void ASurvivorController::SetupInputComponent()
 		//Running
 		EnhancedInputComponent->BindAction(InputData->Run, ETriggerEvent::Triggered, this, &ASurvivorController::Run);
 		EnhancedInputComponent->BindAction(InputData->Run, ETriggerEvent::Completed, this, &ASurvivorController::EndRun);
+
+		EnhancedInputComponent->BindAction(InputData->Revive, ETriggerEvent::Triggered, this, &ASurvivorController::Revive);
 	}
 }
 
@@ -225,7 +227,15 @@ void ASurvivorController::Interact(const FInputActionValue& Value)
 {
 	if(SurvivorCharacter)
 	{
-		SurvivorCharacter->Interact(Value);
+		SurvivorCharacter->Interactor(Value);
+	}
+}
+
+void ASurvivorController::Revive(const FInputActionValue& Value)
+{
+	if(SurvivorCharacter)
+	{
+		SurvivorCharacter->Revive(Value);
 	}
 }
 

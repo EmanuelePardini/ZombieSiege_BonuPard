@@ -217,13 +217,53 @@ void ASurvivorCharacter::SwapBuildable(const FInputActionValue& InputActionValue
 	
 }
 
-void ASurvivorCharacter::Interact(const FInputActionValue& Value)
+void ASurvivorCharacter::Interactor(const FInputActionValue& Value)
 {
 	if(!IsDied)
 	{
 		GetComponentByClass<ULineTraceComponent>()->Interact();
 	}
-	
+}
+
+void ASurvivorCharacter::Revive(const FInputActionValue& Value)
+{
+	if(!IsDied)
+	{
+		GetComponentByClass<ULineTraceComponent>()->Revive(Value);
+	}
+}
+
+FText ASurvivorCharacter::Interact(AActor* Interactor)
+{
+	FText Label;
+	ASurvivorCharacter* Friend = Cast<ASurvivorCharacter>(Interactor);
+	GetWorld()->GetTimerManager().SetTimer(IsRevivingTimer, this, &ASurvivorCharacter::DecreaseRevive, 1.f, true);
+	if (Friend->IsDied)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "dude is dead");
+		if (ReviveProgression == 0)
+		{
+			ReviveProgression++;
+		} else if (ReviveProgression != 100)
+		{
+			ReviveProgression++;
+		} else
+		{
+			Spawn(GetActorLocation());
+		}
+		return FText::FromString("Revive");
+	}
+	return Label;
+}
+
+void ASurvivorCharacter::DecreaseRevive()
+{
+	if (ReviveProgression > 0) ReviveProgression--;
+	if (ReviveProgression == 0)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(IsRevivingTimer);
+	}
+	GEngine->AddOnScreenDebugMessage(10, 5.f, FColor::Orange, FString::FromInt(ReviveProgression));
 }
 
 void ASurvivorCharacter::Drop(const FInputActionValue& Value)
@@ -251,8 +291,7 @@ void ASurvivorCharacter::Spawn(FVector Location)
 {
 	ISpawnInterface::Spawn(Location);
 	IsDied = false;
-	SetActorHiddenInGame(false);
-	SetActorEnableCollision(true);
+	Animations->IsDead = false;
 	HealthComponent->SetupInitialHealth();
 }
 
@@ -268,8 +307,10 @@ void ASurvivorCharacter::Die()
 		if(GameMode && GameMode->IsCoop)
 		{
 			IsDied = true;
-			SetActorHiddenInGame(true);
-			SetActorEnableCollision(false);
+
+			//Reset animations
+
+			Animations->IsDead = true;
 		}
 		if(!IsAnyOneAlive()) UGameplayStatics::OpenLevel(this, "GameOverMap");
 	}

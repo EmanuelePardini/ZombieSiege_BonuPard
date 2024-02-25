@@ -84,6 +84,7 @@ public:
 
 	//Interaction Manage
 	void Interact(const FInputActionValue& Value);
+	void Revive(const FInputActionValue& Value);
 
 	//Drop Items Manage
 	void Drop(const FInputActionValue& Value);

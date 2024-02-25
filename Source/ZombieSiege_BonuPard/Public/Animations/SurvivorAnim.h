@@ -25,6 +25,8 @@ public:
 	bool IsShooting = false;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	bool IsReloading = false;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	bool IsDead = false;
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)

@@ -14,9 +14,8 @@ UCLASS()
 class ZOMBIESIEGE_BONUPARD_API AZombieSiege_GameMode : public AGameModeBase
 {
 	GENERATED_BODY()
-public:
 	AZombieSiege_GameMode();
-	
+public:
 	UPROPERTY(EditAnywhere)
 	bool IsCoop = true; //To switch by single and multiplayer
 	UPROPERTY(EditAnywhere)
@@ -38,8 +37,11 @@ protected:
 
 	UFUNCTION()
 	virtual void InitPlayers();
+	UFUNCTION()
 	void AddSecondPlayer();
+	UFUNCTION()
 	void RemoveSecondPlayer();
+	UFUNCTION()
 	FVector2D GetResolution() const;
 	virtual void Tick(float DeltaSeconds) override;
 };

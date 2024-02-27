@@ -61,6 +61,7 @@ void ASurvivorController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(InputData->Jump, ETriggerEvent::Triggered, this, &ASurvivorController::Jump);
 		
 		//Interacting
+		EnhancedInputComponent->BindAction(InputData->Revive, ETriggerEvent::Triggered, this, &ASurvivorController::Revive);
 		EnhancedInputComponent->BindAction(InputData->Interact, ETriggerEvent::Triggered, this, &ASurvivorController::Interact);
 		EnhancedInputComponent->BindAction(InputData->Drop, ETriggerEvent::Triggered, this, &ASurvivorController::Drop);
 
@@ -87,8 +88,6 @@ void ASurvivorController::SetupInputComponent()
 		//Running
 		EnhancedInputComponent->BindAction(InputData->Run, ETriggerEvent::Triggered, this, &ASurvivorController::Run);
 		EnhancedInputComponent->BindAction(InputData->Run, ETriggerEvent::Completed, this, &ASurvivorController::EndRun);
-
-		EnhancedInputComponent->BindAction(InputData->Revive, ETriggerEvent::Triggered, this, &ASurvivorController::Revive);
 	}
 }
 

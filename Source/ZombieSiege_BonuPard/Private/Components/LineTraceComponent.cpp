@@ -2,6 +2,7 @@
 
 
 #include "Components/LineTraceComponent.h"
+#include "Items/BuyableItem.h"
 #include "CustomHUD.h"
 #include "Character/SurvivorCharacter.h"
 #include "Character/SurvivorController.h"
@@ -53,7 +54,6 @@ void ULineTraceComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 
 void ULineTraceComponent::Interact() const
 {
-	GEngine->AddOnScreenDebugMessage(1,8,FColor::Emerald, TEXT("Interact"));
 	auto [Hits, _Start, _End, _Params] = DoLineTrace(false);
 	ASurvivorCharacter* Owner = GetOwner<ASurvivorCharacter>();
 	for (const FHitResult& Hit : Hits)
@@ -80,7 +80,6 @@ void ULineTraceComponent::Interact() const
 
 void ULineTraceComponent::Interact(const FInputActionValue& Value)
 {
-	GEngine->AddOnScreenDebugMessage(1,8,FColor::Red, TEXT("Interact"));
 	auto [Hits, _Start, _End, _Params] = DoLineTrace(false);
 	ASurvivorCharacter* Owner = GetOwner<ASurvivorCharacter>();
 	for (const FHitResult& Hit : Hits)
@@ -107,7 +106,6 @@ void ULineTraceComponent::Interact(const FInputActionValue& Value)
 
 void ULineTraceComponent::Revive(const FInputActionValue& Value)
 {
-	GEngine->AddOnScreenDebugMessage(1,8,FColor::Blue, TEXT("Revive"));
 	auto [Hits, _Start, _End, _Params] = DoLineTrace(false);
 	ASurvivorCharacter* Owner = GetOwner<ASurvivorCharacter>();
 	for (const FHitResult& Hit : Hits)

@@ -240,11 +240,10 @@ FText ASurvivorCharacter::Interact(AActor* Interactor)
 	GetWorld()->GetTimerManager().SetTimer(IsRevivingTimer, this, &ASurvivorCharacter::DecreaseRevive, 1.f, true);
 	if (Friend->IsDied)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "dude is dead");
 		if (ReviveProgression == 0)
 		{
 			ReviveProgression++;
-		} else if (ReviveProgression != 100)
+		} else if (ReviveProgression < ReviveTotal)
 		{
 			ReviveProgression++;
 		} else
@@ -263,7 +262,6 @@ void ASurvivorCharacter::DecreaseRevive()
 	{
 		GetWorld()->GetTimerManager().ClearTimer(IsRevivingTimer);
 	}
-	GEngine->AddOnScreenDebugMessage(10, 5.f, FColor::Orange, FString::FromInt(ReviveProgression));
 }
 
 void ASurvivorCharacter::Drop(const FInputActionValue& Value)
@@ -284,7 +282,6 @@ void ASurvivorCharacter::Tick(float DeltaTime)
 	{
 		ManageReload(DeltaTime);
 	}
-	
 }
 
 void ASurvivorCharacter::Spawn(FVector Location)

@@ -17,7 +17,7 @@
 #include "SurvivorCharacter.generated.h"
 
 UCLASS()
-class ZOMBIESIEGE_BONUPARD_API ASurvivorCharacter : public ACharacter, public ISpawnInterface
+class ZOMBIESIEGE_BONUPARD_API ASurvivorCharacter : public ACharacter, public ISpawnInterface, public IInteractableInterface
 {
 	GENERATED_BODY()
 
@@ -66,6 +66,8 @@ public:
 	FTimerHandle IsRevivingTimer;
 	UPROPERTY(VisibleAnywhere)
 	int ReviveProgression = 0;
+	UPROPERTY(VisibleAnywhere)
+	int ReviveTotal = 50;
 	
 
 	//Audio Management
@@ -111,8 +113,9 @@ public:
 
 	//Interaction Manage
 	void Interactor(const FInputActionValue& Value);
-	FText Interact(AActor* Interactor);
+	virtual FText Interact(AActor* Interactor) override;
 	void DecreaseRevive();
+	
 	//Drop Items Manage
 	void Drop(const FInputActionValue& Value);
 	

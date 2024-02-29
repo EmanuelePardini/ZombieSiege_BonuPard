@@ -17,8 +17,7 @@ void ASurvivorController::SetUpHUD(FVector2D Position, FVector2D Size)
 	if (HUDClass) {
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.Owner = this;
-		ACustomHUD* NewHUD = GetWorld()->SpawnActor<ACustomHUD>(HUDClass, SpawnParams);
-		if (NewHUD) PlayerHUD = NewHUD;
+		PlayerHUD = GetWorld()->SpawnActor<ACustomHUD>(HUDClass, SpawnParams);
 	}
 	
 	if (IsLocalPlayerController() && PlayerHUD)
@@ -61,8 +60,11 @@ void ASurvivorController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(InputData->Jump, ETriggerEvent::Triggered, this, &ASurvivorController::Jump);
 		
 		//Interacting
+		EnhancedInputComponent->BindAction(InputData->Revive, ETriggerEvent::Triggered, this, &ASurvivorController::Revive);
 		EnhancedInputComponent->BindAction(InputData->Interact, ETriggerEvent::Triggered, this, &ASurvivorController::Interact);
-		EnhancedInputComponent->BindAction(InputData->Drop, ETriggerEvent::Triggered, this, &ASurvivorController::Drop);
+
+		//Coop
+		EnhancedInputComponent->BindAction(InputData->ManageCoop, ETriggerEvent::Triggered, this, &ASurvivorController::ManageCoop);
 
 		//Crouching
 		EnhancedInputComponent->BindAction(InputData->Crouch, ETriggerEvent::Triggered, this, &ASurvivorController::Crouch);
@@ -92,12 +94,12 @@ void ASurvivorController::SetupInputComponent()
 
 void ASurvivorController::ManageTimers(float DeltaSeconds)
 {
-	InteractTimer += DeltaSeconds;
+	ManageCoopTimer += DeltaSeconds;
 	
-	if(InteractTimer >= InteractDelay)
+	if(ManageCoopTimer >= ManageCoopDelay)
 	{
-		CanInteract = true;
-		InteractTimer = 0;
+		CanManageCoop = true;
+		ManageCoopTimer = 0;
 	}
 }
 
@@ -225,14 +227,23 @@ void ASurvivorController::Interact(const FInputActionValue& Value)
 {
 	if(SurvivorCharacter)
 	{
-		SurvivorCharacter->Interact(Value);
+		SurvivorCharacter->Interactor(Value);
 	}
 }
 
-void ASurvivorController::Drop(const FInputActionValue& Value)
+void ASurvivorController::Revive(const FInputActionValue& Value)
 {
 	if(SurvivorCharacter)
 	{
-		SurvivorCharacter->Drop(Value);
+		SurvivorCharacter->Revive(Value);
+	}
+}
+
+void ASurvivorController::ManageCoop(const FInputActionValue& Value)
+{
+	if(SurvivorCharacter && CanManageCoop)
+	{
+		SurvivorCharacter->ManageCoop(Value);
+		CanManageCoop = false;
 	}
 }

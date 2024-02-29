@@ -217,17 +217,57 @@ void ASurvivorCharacter::SwapBuildable(const FInputActionValue& InputActionValue
 	
 }
 
-void ASurvivorCharacter::Interact(const FInputActionValue& Value)
+void ASurvivorCharacter::Interactor(const FInputActionValue& Value)
 {
 	if(!IsDied)
 	{
 		GetComponentByClass<ULineTraceComponent>()->Interact();
 	}
-	
 }
 
-void ASurvivorCharacter::Drop(const FInputActionValue& Value)
+void ASurvivorCharacter::Revive(const FInputActionValue& Value)
 {
+	if(!IsDied)
+	{
+		GetComponentByClass<ULineTraceComponent>()->Revive(Value);
+	}
+}
+
+FText ASurvivorCharacter::Interact(AActor* Interactor)
+{
+	FText Label;
+	ASurvivorCharacter* Friend = Cast<ASurvivorCharacter>(Interactor);
+	GetWorld()->GetTimerManager().SetTimer(IsRevivingTimer, this, &ASurvivorCharacter::DecreaseRevive, 1.f, true);
+	if (Friend->IsDied)
+	{
+		if (ReviveProgression == 0)
+		{
+			ReviveProgression++;
+		} else if (ReviveProgression < ReviveTotal)
+		{
+			ReviveProgression++;
+		} else
+		{
+			Spawn(GetActorLocation());
+		}
+		return FText::FromString("Revive");
+	}
+	return Label;
+}
+
+void ASurvivorCharacter::DecreaseRevive()
+{
+	if (ReviveProgression > 0) ReviveProgression--;
+	if (ReviveProgression == 0)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(IsRevivingTimer);
+	}
+}
+
+void ASurvivorCharacter::ManageCoop(const FInputActionValue& Value)
+{
+		AZombieSiege_GameMode* GameMode = Cast<AZombieSiege_GameMode>(GetWorld()->GetAuthGameMode());
+		if(GameMode) GameMode->CheckCoop();           
 }
 
 // Called every frame
@@ -244,21 +284,23 @@ void ASurvivorCharacter::Tick(float DeltaTime)
 	{
 		ManageReload(DeltaTime);
 	}
-	
+
 }
 
 void ASurvivorCharacter::Spawn(FVector Location)
 {
 	ISpawnInterface::Spawn(Location);
 	IsDied = false;
-	SetActorHiddenInGame(false);
-	SetActorEnableCollision(true);
+	Animations->IsDead = false;
 	HealthComponent->SetupInitialHealth();
 }
 
 void ASurvivorCharacter::Die()
 {
 	ISpawnInterface::Die();
+
+	IsDied = true;
+	Animations->IsDead = true;
 	
 	UWorld* World = GetWorld();
 	
@@ -267,11 +309,13 @@ void ASurvivorCharacter::Die()
 		AZombieSiege_GameMode* GameMode = Cast<AZombieSiege_GameMode>(World->GetAuthGameMode());
 		if(GameMode && GameMode->IsCoop)
 		{
-			IsDied = true;
-			SetActorHiddenInGame(true);
-			SetActorEnableCollision(false);
+			if(!IsAnyOneAlive()) UGameplayStatics::OpenLevel(this, "GameOverMap");
 		}
-		if(!IsAnyOneAlive()) UGameplayStatics::OpenLevel(this, "GameOverMap");
+		else
+		{
+			UGameplayStatics::OpenLevel(this, "GameOverMap");
+		}
+		
 	}
 }
 

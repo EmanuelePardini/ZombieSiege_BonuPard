@@ -17,7 +17,7 @@
 #include "SurvivorCharacter.generated.h"
 
 UCLASS()
-class ZOMBIESIEGE_BONUPARD_API ASurvivorCharacter : public ACharacter, public ISpawnInterface
+class ZOMBIESIEGE_BONUPARD_API ASurvivorCharacter : public ACharacter, public ISpawnInterface, public IInteractableInterface
 {
 	GENERATED_BODY()
 
@@ -56,12 +56,21 @@ public:
 	bool IsReloading = false;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	bool IsDied = false;
+
 	
 	//Timers
 	UPROPERTY(EditAnywhere, Category = "Setup")
 	float ReloadDelay = 2.f;
 	UPROPERTY(EditAnywhere, Category = "Setup")
 	float ReloadTimer = 0.f;
+	UPROPERTY(VisibleAnywhere)
+	FTimerHandle IsRevivingTimer;
+	UPROPERTY(VisibleAnywhere)
+	int ReviveProgression = 0;
+	UPROPERTY(VisibleAnywhere)
+	int ReviveTotal = 50;
+
+	
 
 	//Audio Management
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
@@ -102,12 +111,15 @@ public:
 	void ToggleBuild(const FInputActionValue& Value);
 	void Build(const FInputActionValue& Value);
 	void SwapBuildable(const FInputActionValue& InputActionValue);
-	
+	void Revive(const FInputActionValue& Value);
+
 	//Interaction Manage
-	void Interact(const FInputActionValue& Value);
+	void Interactor(const FInputActionValue& Value);
+	virtual FText Interact(AActor* Interactor) override;
+	void DecreaseRevive();
 	
-	//Drop Items Manage
-	void Drop(const FInputActionValue& Value);
+	//Player Activation Manage
+	void ManageCoop(const FInputActionValue& Value);
 	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

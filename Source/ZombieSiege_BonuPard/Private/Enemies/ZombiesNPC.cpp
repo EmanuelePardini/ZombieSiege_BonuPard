@@ -48,6 +48,7 @@ void AZombiesNPC::BeginPlay()
 void AZombiesNPC::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
 	if(Animations) Animations->Animate(this);
 	if(!IsDied) SearchObj(ObjToSearch);
 	if(IsDied) Move(GetActorLocation()); //If is died stop moving to the last location setted

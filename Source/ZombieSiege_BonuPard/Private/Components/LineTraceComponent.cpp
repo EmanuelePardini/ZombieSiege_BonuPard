@@ -78,6 +78,58 @@ void ULineTraceComponent::Interact() const
 	}
 }
 
+void ULineTraceComponent::Interact(const FInputActionValue& Value)
+{
+	auto [Hits, _Start, _End, _Params] = DoLineTrace(false);
+	ASurvivorCharacter* Owner = GetOwner<ASurvivorCharacter>();
+	for (const FHitResult& Hit : Hits)
+	{
+		AActor* HitActor = Hit.GetActor();
+		if (!HitActor) continue;
+		if (HitActor->GetClass()->ImplementsInterface(UInteractableInterface::StaticClass()))
+		{
+			IInteractableInterface* Interactable = Cast<IInteractableInterface>(HitActor);
+			if (Interactable)
+			{
+				FText InteractionLabel = Interactable->Interact(Owner);
+				ASurvivorController* Controller = Cast<ASurvivorController>(Owner->GetController());
+				if (!Controller) return;
+				ACustomHUD* HUD = Cast<ACustomHUD>(Controller->PlayerHUD);
+				if (HUD)
+				{
+					HUD->SetLabelText(InteractionLabel);
+				}
+			}
+		}
+	}
+}
+
+void ULineTraceComponent::Revive(const FInputActionValue& Value)
+{
+	auto [Hits, _Start, _End, _Params] = DoLineTrace(false);
+	ASurvivorCharacter* Owner = GetOwner<ASurvivorCharacter>();
+	for (const FHitResult& Hit : Hits)
+	{
+		AActor* HitActor = Hit.GetActor();
+		if (!HitActor) continue;
+		if (HitActor->GetClass()->ImplementsInterface(UInteractableInterface::StaticClass()))
+		{
+			IInteractableInterface* Interactable = Cast<IInteractableInterface>(HitActor);
+			if (Interactable)
+			{
+				FText InteractionLabel = Interactable->Interact(HitActor);
+				ASurvivorController* Controller = Cast<ASurvivorController>(Owner->GetController());
+				if (!Controller) return;
+				ACustomHUD* HUD = Cast<ACustomHUD>(Controller->PlayerHUD);
+				if (HUD)
+				{
+					HUD->SetLabelText(InteractionLabel);
+				}
+			}
+		}
+	}
+}
+
 void ULineTraceComponent::IsInteractable() const
 {
 	UWorld* Context = GetWorld();
@@ -86,7 +138,12 @@ void ULineTraceComponent::IsInteractable() const
 
 	auto [Hits, _Start, _End, _Params] = DoLineTrace(false);
 	ASurvivorController* Controller = Cast<ASurvivorController>(Owner->GetController());
-	ACustomHUD* HUD = Cast<ACustomHUD>(Controller->PlayerHUD);
+
+	if (!Controller) return;
+
+	ACustomHUD* CustomHUD = Cast<ACustomHUD>(Controller->PlayerHUD);
+	if(!CustomHUD) return ;
+		
 	TArray<FEnhancedActionKeyMapping> Mappings = Cast<ASurvivorController>(Owner->GetController())->IMC->GetMappings();
 	FString ActionKey;
 
@@ -98,14 +155,15 @@ void ULineTraceComponent::IsInteractable() const
 		}
 	}
 
-	if (Hits.Num() > 0 && HUD && ActionKey != "")
+	if (Hits.Num() > 0 && ActionKey != "")
 	{
-		HUD->SetTopLeftText(FText::FromString("Press " + ActionKey + " to interact"));
+		CustomHUD->SetTopLeftText(FText::FromString("Press " + ActionKey + " to interact"));
 	}
-	else if (HUD)
+	else
 	{
-		HUD->SetTopLeftText(FText::FromString(""));
+		CustomHUD->SetTopLeftText(FText::FromString(""));
 	}
+
 }
 
 FTraces ULineTraceComponent::DoLineTrace(const bool bIsDebug) const
@@ -114,8 +172,7 @@ FTraces ULineTraceComponent::DoLineTrace(const bool bIsDebug) const
 	const UWorld* Context = GetWorld();
 	const ASurvivorCharacter* Owner = GetOwner<ASurvivorCharacter>();
 	if (!Context || !Owner) return Traces;
-
-	// TODO: Add a way to prevent interaction if character is not facing the interactable
+	
 	Traces.Start = Owner->GetActorLocation();
 	Traces.Start.Z += Owner->BaseEyeHeight;
 	Traces.End = Traces.Start + Camera->GetForwardVector() * InteractionDistance;

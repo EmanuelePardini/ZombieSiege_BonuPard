@@ -43,6 +43,7 @@ void UHealthComponent::DecrementHealth(float DamageAmount)
 	Health -= DamageAmount;
 	if(Health <= 0)
 	{
+		Health = 0;
 		Die();
 	}
 		OnHealthChanged.Broadcast(Health);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "InputActionValue.h"
 #include "Camera/CameraComponent.h"
 #include "Components/ActorComponent.h"
 #include "LineTraceComponent.generated.h"
@@ -39,6 +40,8 @@ protected:
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	void Interact() const;
+	void Interact(const FInputActionValue& Value);
+	void Revive(const FInputActionValue& Value);
 	void IsInteractable() const;
 
 private:

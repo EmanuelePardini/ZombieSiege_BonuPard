@@ -29,7 +29,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category="Setup")
 	UInputAction* Interact;
 	UPROPERTY(EditDefaultsOnly, Category="Setup")
-	UInputAction* Drop;
+	UInputAction* ManageCoop;
 	UPROPERTY(EditDefaultsOnly, Category="Setup")
 	UInputAction* Aim;
 	UPROPERTY(EditDefaultsOnly, Category="Setup")
@@ -42,4 +42,6 @@ public:
 	UInputAction* Build;
 	UPROPERTY(EditDefaultsOnly, Category="Setup")
 	UInputAction* SwapBuildable;
+	UPROPERTY(EditDefaultsOnly, Category="Setup")
+	UInputAction* Revive;
 };

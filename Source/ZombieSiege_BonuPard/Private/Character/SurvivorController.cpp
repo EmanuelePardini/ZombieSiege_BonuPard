@@ -17,8 +17,7 @@ void ASurvivorController::SetUpHUD(FVector2D Position, FVector2D Size)
 	if (HUDClass) {
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.Owner = this;
-		ACustomHUD* NewHUD = GetWorld()->SpawnActor<ACustomHUD>(HUDClass, SpawnParams);
-		if (NewHUD) PlayerHUD = NewHUD;
+		PlayerHUD = GetWorld()->SpawnActor<ACustomHUD>(HUDClass, SpawnParams);
 	}
 	
 	if (IsLocalPlayerController() && PlayerHUD)
@@ -63,7 +62,9 @@ void ASurvivorController::SetupInputComponent()
 		//Interacting
 		EnhancedInputComponent->BindAction(InputData->Revive, ETriggerEvent::Triggered, this, &ASurvivorController::Revive);
 		EnhancedInputComponent->BindAction(InputData->Interact, ETriggerEvent::Triggered, this, &ASurvivorController::Interact);
-		EnhancedInputComponent->BindAction(InputData->Drop, ETriggerEvent::Triggered, this, &ASurvivorController::Drop);
+
+		//Coop
+		EnhancedInputComponent->BindAction(InputData->ManageCoop, ETriggerEvent::Triggered, this, &ASurvivorController::ManageCoop);
 
 		//Crouching
 		EnhancedInputComponent->BindAction(InputData->Crouch, ETriggerEvent::Triggered, this, &ASurvivorController::Crouch);
@@ -93,12 +94,12 @@ void ASurvivorController::SetupInputComponent()
 
 void ASurvivorController::ManageTimers(float DeltaSeconds)
 {
-	InteractTimer += DeltaSeconds;
+	ManageCoopTimer += DeltaSeconds;
 	
-	if(InteractTimer >= InteractDelay)
+	if(ManageCoopTimer >= ManageCoopDelay)
 	{
-		CanInteract = true;
-		InteractTimer = 0;
+		CanManageCoop = true;
+		ManageCoopTimer = 0;
 	}
 }
 
@@ -238,10 +239,11 @@ void ASurvivorController::Revive(const FInputActionValue& Value)
 	}
 }
 
-void ASurvivorController::Drop(const FInputActionValue& Value)
+void ASurvivorController::ManageCoop(const FInputActionValue& Value)
 {
-	if(SurvivorCharacter)
+	if(SurvivorCharacter && CanManageCoop)
 	{
-		SurvivorCharacter->Drop(Value);
+		SurvivorCharacter->ManageCoop(Value);
+		CanManageCoop = false;
 	}
 }

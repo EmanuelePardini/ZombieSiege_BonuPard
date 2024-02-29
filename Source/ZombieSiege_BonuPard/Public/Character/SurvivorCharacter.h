@@ -56,6 +56,7 @@ public:
 	bool IsReloading = false;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	bool IsDied = false;
+
 	
 	//Timers
 	UPROPERTY(EditAnywhere, Category = "Setup")
@@ -68,6 +69,7 @@ public:
 	int ReviveProgression = 0;
 	UPROPERTY(VisibleAnywhere)
 	int ReviveTotal = 50;
+
 	
 
 	//Audio Management
@@ -116,8 +118,8 @@ public:
 	virtual FText Interact(AActor* Interactor) override;
 	void DecreaseRevive();
 	
-	//Drop Items Manage
-	void Drop(const FInputActionValue& Value);
+	//Player Activation Manage
+	void ManageCoop(const FInputActionValue& Value);
 	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

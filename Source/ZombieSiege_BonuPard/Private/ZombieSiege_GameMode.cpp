@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "ZombieSiege_GameMode.h"
 #include "Character/SurvivorController.h"
 #include "Components/AudioComponent.h"
@@ -17,8 +14,6 @@ AZombieSiege_GameMode::AZombieSiege_GameMode()
 	AudioComponent->bAutoActivate = true;
 	AudioComponent->VolumeMultiplier = 0.1f;
 	AudioComponent->OnAudioFinished.AddDynamic(this, &AZombieSiege_GameMode::RestartAudio);
-	OnPlayerChanged.AddDynamic(this, &AZombieSiege_GameMode::AddSecondPlayer);
-	OnPlayerChanged.AddDynamic(this, &AZombieSiege_GameMode::RemoveSecondPlayer);
 }
 
 void AZombieSiege_GameMode::BeginPlay()
@@ -36,17 +31,12 @@ void AZombieSiege_GameMode::RestartAudio()
 	AudioComponent->Play();
 }
 
-void AZombieSiege_GameMode::OnControllerConnectionChange(bool bIsConnected, int32 UserId, int32 ControllerId)
+void AZombieSiege_GameMode::CheckCoop()
 {
-	if (IsCoop)
-	{
-		IsCoop = false;
-		OnPlayerChanged.Broadcast();
-	}
-	else if(!IsCoop)
+	if(!IsCoop)
 	{
 		IsCoop = true;
-		OnPlayerChanged.Broadcast();
+		AddSecondPlayer();
 	}
 }
 
@@ -58,7 +48,6 @@ void AZombieSiege_GameMode::InitPlayers()
 	
 	FirstController->AssignPlayersIMC();
 	FirstController->SetUpHUD(FVector2D(0, 0),  FVector2D(Resolution.X, Resolution.Y / 2));
-	if(IsCoop) AddSecondPlayer();
 }
 
 void AZombieSiege_GameMode::AddSecondPlayer()
@@ -81,17 +70,6 @@ void AZombieSiege_GameMode::AddSecondPlayer()
 	}
 }
 
-void AZombieSiege_GameMode::RemoveSecondPlayer()
-{
-	if(!IsCoop)
-	{
-		if (UGameInstance* GameInstance = GetWorld()->GetGameInstance())
-		{
-			GameInstance->RemoveLocalPlayer(GameInstance->GetLocalPlayerByIndex(SecondUserId));
-		}
-	}
-}
-
 FVector2D AZombieSiege_GameMode::GetResolution() const
 {
 	FVector2D Resolution(0.0f, 0.0f);
@@ -106,4 +84,3 @@ void AZombieSiege_GameMode::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 }
-

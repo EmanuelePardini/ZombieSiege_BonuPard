@@ -38,11 +38,11 @@ protected:
 	
 	//To Manage Actions Timer and avoid Spam
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Timer")
-	bool CanInteract;
+	bool CanManageCoop;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Timer")
-	float InteractTimer = 0;
+	float ManageCoopTimer = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Timer")
-	float InteractDelay = 0.5;
+	float ManageCoopDelay = 10;
 
 	virtual void BeginPlay() override;
 	
@@ -86,6 +86,6 @@ public:
 	void Interact(const FInputActionValue& Value);
 	void Revive(const FInputActionValue& Value);
 
-	//Drop Items Manage
-	void Drop(const FInputActionValue& Value);
+	//PlayerActivation
+	void ManageCoop(const FInputActionValue& Value);
 };

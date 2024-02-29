@@ -264,8 +264,10 @@ void ASurvivorCharacter::DecreaseRevive()
 	}
 }
 
-void ASurvivorCharacter::Drop(const FInputActionValue& Value)
+void ASurvivorCharacter::ManageCoop(const FInputActionValue& Value)
 {
+		AZombieSiege_GameMode* GameMode = Cast<AZombieSiege_GameMode>(GetWorld()->GetAuthGameMode());
+		if(GameMode) GameMode->CheckCoop();           
 }
 
 // Called every frame
@@ -282,6 +284,7 @@ void ASurvivorCharacter::Tick(float DeltaTime)
 	{
 		ManageReload(DeltaTime);
 	}
+
 }
 
 void ASurvivorCharacter::Spawn(FVector Location)
@@ -295,6 +298,9 @@ void ASurvivorCharacter::Spawn(FVector Location)
 void ASurvivorCharacter::Die()
 {
 	ISpawnInterface::Die();
+
+	IsDied = true;
+	Animations->IsDead = true;
 	
 	UWorld* World = GetWorld();
 	
@@ -303,13 +309,13 @@ void ASurvivorCharacter::Die()
 		AZombieSiege_GameMode* GameMode = Cast<AZombieSiege_GameMode>(World->GetAuthGameMode());
 		if(GameMode && GameMode->IsCoop)
 		{
-			IsDied = true;
-
-			//Reset animations
-
-			Animations->IsDead = true;
+			if(!IsAnyOneAlive()) UGameplayStatics::OpenLevel(this, "GameOverMap");
 		}
-		if(!IsAnyOneAlive()) UGameplayStatics::OpenLevel(this, "GameOverMap");
+		else
+		{
+			UGameplayStatics::OpenLevel(this, "GameOverMap");
+		}
+		
 	}
 }
 

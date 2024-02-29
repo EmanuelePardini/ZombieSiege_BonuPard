@@ -138,7 +138,12 @@ void ULineTraceComponent::IsInteractable() const
 
 	auto [Hits, _Start, _End, _Params] = DoLineTrace(false);
 	ASurvivorController* Controller = Cast<ASurvivorController>(Owner->GetController());
-	ACustomHUD* HUD = Cast<ACustomHUD>(Controller->PlayerHUD);
+
+	if (!Controller) return;
+
+	ACustomHUD* CustomHUD = Cast<ACustomHUD>(Controller->PlayerHUD);
+	if(!CustomHUD) return ;
+		
 	TArray<FEnhancedActionKeyMapping> Mappings = Cast<ASurvivorController>(Owner->GetController())->IMC->GetMappings();
 	FString ActionKey;
 
@@ -150,14 +155,15 @@ void ULineTraceComponent::IsInteractable() const
 		}
 	}
 
-	if (Hits.Num() > 0 && HUD && ActionKey != "")
+	if (Hits.Num() > 0 && ActionKey != "")
 	{
-		HUD->SetTopLeftText(FText::FromString("Press " + ActionKey + " to interact"));
+		CustomHUD->SetTopLeftText(FText::FromString("Press " + ActionKey + " to interact"));
 	}
-	else if (HUD)
+	else
 	{
-		HUD->SetTopLeftText(FText::FromString(""));
+		CustomHUD->SetTopLeftText(FText::FromString(""));
 	}
+
 }
 
 FTraces ULineTraceComponent::DoLineTrace(const bool bIsDebug) const

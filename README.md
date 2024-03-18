@@ -7,6 +7,7 @@ The code for a Zombie FPS Tower defense game made in Unreal Engine 5
 All customizable:
 
 - Waves of Zombies
+- Zombies AI and Navigation
 - Shelters / Towers to defend
 - Local Multiplayer
 - Build System
